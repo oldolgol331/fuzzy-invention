@@ -1,42 +1,30 @@
 spring:
-  datasource:
+  datasource-data:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:tcp://localhost:1521/test;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    jdbc-url: jdbc:h2:tcp://localhost:1521/data_db;MODE=MySQL;DATABASE_TO_LOWER=TRUE
     username: sa
     password:
-    #driver-class-name: com.mysql.cj.jdbc.Driver
-    #url: ${MYSQL_URL:jdbc:mysql://localhost:3306/test?serverTimezone=Asia/Seoul}
-    #username: ${MYSQL_USER:test}
-    #password: ${MYSQL_PASSWORD:test}
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 10
-  #datasource-data:
-    #driver-class-name: org.h2.Driver
-    #jdbc-url: jdbc:h2:tcp://localhost:1521/data_db;MODE=MySQL;DATABASE_TO_LOWER=TRUE
-    #username: sa
-    #password:
     #driver-class-name: com.mysql.cj.jdbc.Driver
     #jdbc-url: ${MYSQL_DATA_URL:jdbc:mysql://localhost:3306/data_db?serverTimezone=Asia/Seoul}
     #username: ${MYSQL_USER:test}
     #password: ${MYSQL_PASSWORD:test}
-    #hikari:
-      #pool-name: data-db-hikaricp
-      #maximum-pool-size: 10
-      #minimum-idle: 10
-  #datasource-meta:
-    #driver-class-name: org.h2.Driver
-    #jdbc-url: jdbc:h2:tcp://localhost:1521/meta_db;MODE=MySQL;DATABASE_TO_LOWER=TRUE
-    #username: sa
-    #password:
+    hikari:
+      pool-name: data-db-hikaricp
+      maximum-pool-size: 10
+      minimum-idle: 10
+  datasource-meta:
+    driver-class-name: org.h2.Driver
+    jdbc-url: jdbc:h2:tcp://localhost:1521/meta_db;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
     #driver-class-name: com.mysql.cj.jdbc.Driver
     #jdbc-url: ${MYSQL_META_URL:jdbc:mysql://localhost:3306/meta_db?serverTimezone=Asia/Seoul}
     #username: ${MYSQL_USER:test}
     #password: ${MYSQL_PASSWORD:test}
-    #hikari:
-      #pool-name: meta-db-hikaricp
-      #maximum-pool-size: 10
-      #minimum-idle: 10
+    hikari:
+      pool-name: meta-db-hikaricp
+      maximum-pool-size: 10
+      minimum-idle: 10
   sql:
     init:
       mode: embedded
@@ -44,8 +32,8 @@ spring:
       platform: all
       separator: ;
       schema-locations:
-        - classpath:/schema-h2.sql
-        #- classpath:/schema-mysql.sql
+        - classpath:/schema-h2-data_db.sql
+        #- classpath:/schema-mysql-data_db.sql
   jpa:
     hibernate:
       ddl-auto: validate

@@ -1,0 +1,29 @@
+name: demo-docker-dev
+
+services:
+  h2:
+    image: oscarfonts/h2:latest
+    container_name: demo-h2
+    restart: always
+    networks:
+      - demo-dev-network
+    environment:
+      H2_OPTIONS: "-ifNotExists"
+    ports:
+      - "1521:1521"
+      - "81:81"
+    #volumes:
+      #- ./h2/data:/opt/h2-data
+  smtp4dev:
+    image: rnwood/smtp4dev:latest
+    container_name: demo-smtp4dev
+    restart: always
+    networks:
+      - demo-dev-network
+    ports:
+      - "5000:80"
+      - "2525:25"
+
+networks:
+  demo-dev-network:
+    driver: bridge

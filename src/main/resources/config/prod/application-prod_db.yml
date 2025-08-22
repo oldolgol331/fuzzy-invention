@@ -1,0 +1,100 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 10
+  #datasource-data:
+    #driver-class-name: com.mysql.cj.jdbc.Driver
+    #jdbc-url: ${MYSQL_DATA_URL}
+    #username: ${MYSQL_USER}
+    #password: ${MYSQL_PASSWORD}
+    #hikari:
+      #pool-name: data-db-hikaricp
+      #maximum-pool-size: 10
+      #minimum-idle: 10
+  #datasource-meta:
+    #driver-class-name: com.mysql.cj.jdbc.Driver
+    #jdbc-url: ${MYSQL_META_URL}
+    #username: ${MYSQL_USER}
+    #password: ${MYSQL_PASSWORD}
+    #hikari:
+      #pool-name: meta-db-hikaricp
+      #maximum-pool-size: 10
+      #minimum-idle: 10
+  sql:
+    init:
+      mode: never
+      #continue-on-error: false
+      #platform: all
+      #separator: ;
+      schema-locations:
+        - classpath:/schema-mysql.sql
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      naming:
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        default_batch_fetch_size: 100
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
+        #show_sql: true
+        #format_sql: true
+        #highlight_sql: true
+        #use_sql_comments: true
+    open-in-view: false
+  batch:
+    jdbc:
+      initialize-schema: never
+      schema: classpath:org/springframework/batch/core/schema-mysql.sql
+    job:
+      enabled: false
+  redis:
+    client-type: lettuce
+    database: 0
+    host: ${REDIS_HOST}
+    port: ${REDIS_HOST_PORT}
+    password: ${REDIS_PASSWORD}
+    lettuce:
+      pool:
+        enabled: true
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1ms
+  elasticsearch:
+    uris:
+      - ${ELASTICSEARCH_URI}
+    username: ${ELASTICSEARCH_USERNAME}
+    password: ${ELASTICSEARCH_PASSWORD}
+#logging:
+  #level:
+    #org.hibernate.sql: debug
+    #org.hibernate.type.descriptor.sql.BasicBinder: trace
+decorator:
+  datasource:
+    p6spy:
+      logging: slf4j
+      enable-logging: false
+      multiline: true
+    datasource-proxy:
+      logging: slf4j
+      query:
+        enable-logging: false
+        log-level: debug
+      multiline: true
+      json-format: false
+      count-query: false
+      slow-query:
+        enable-logging: false
+        log-level: warn
+        threshold: 300

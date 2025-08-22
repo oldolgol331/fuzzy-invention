@@ -1,0 +1,168 @@
+plugins {
+    id 'idea'
+    id 'java'
+    id 'org.springframework.boot' version '2.7.18'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'io.freefair.lombok' version '6.6.3'
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '1.8'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+// dependency versions
+def springDocOpenApiUiVersion = "1.8.0"
+def querydslVersion = "5.0.0"
+def p6spyVersion = "1.8.1"
+def datasourceProxyVersion = "1.8.1"
+def jjwtVersion = "0.12.6"
+def redissonVersion = "3.50.0"
+def javaxPersistenceApiVersion = "2.2"
+def jakartaValidationApiVersion = "3.1.1"
+def autoParamsVersion = "11.3.1"
+def fixtureMonkeyVersion = "1.1.14"
+def dataFakerVersion = "1.9.0"
+//def jqwikVersion = "1.9.3"
+def jqwikVersion = "1.7.3"
+def awaitilityVersion = "4.3.0"
+def embeddedRedisVersion = "1.4.3"
+def greenMailVersion = "1.6.15"
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.retry:spring-retry'
+
+    // Jackson Datatype: JSR310
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    // SpringDoc OpenAPI UI
+    implementation "org.springdoc:springdoc-openapi-ui:$springDocOpenApiUiVersion"
+
+    // Querydsl JPA Support
+    implementation "com.querydsl:querydsl-jpa:$querydslVersion"
+    // Querydsl APT Support
+    annotationProcessor "com.querydsl:querydsl-apt:$querydslVersion:jpa"
+
+    // P6Spy Spring Boot Starter
+    implementation "com.github.gavlyukovskiy:p6spy-spring-boot-starter:$p6spyVersion"
+
+    // Datasource Proxy Spring Boot Starter
+    implementation "com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:$datasourceProxyVersion"
+
+    // JJWT :: API
+    implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
+    // JJWT :: Impl
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
+    // JJWT :: Extensions :: Jackson
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
+
+    // Redisson
+    implementation "org.redisson:redisson:$redissonVersion"
+    // Redisson/Spring Boot Starter
+    implementation "org.redisson:redisson-spring-boot-starter:$redissonVersion"
+    // Redisson/Spring Data Redis V2.7.x Integration
+    implementation "org.redisson:redisson-spring-data-27:$redissonVersion"
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    // Javax Persistence API
+    annotationProcessor "javax.persistence:javax.persistence-api:$javaxPersistenceApiVersion"
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // Jakarta Validation API
+    testImplementation "jakarta.validation:jakarta.validation-api:$jakartaValidationApiVersion"
+
+    // AutoParams
+    testImplementation "io.github.autoparams:autoparams:$autoParamsVersion"
+    // AutoParams Lombok
+    testImplementation "io.github.autoparams:autoparams-lombok:$autoParamsVersion"
+    // AutoParams Mockito
+    testImplementation "io.github.autoparams:autoparams-mockito:$autoParamsVersion"
+
+    // Fixture Monkey
+    testImplementation "com.navercorp.fixturemonkey:fixture-monkey-autoparams:$fixtureMonkeyVersion"
+    testImplementation "com.navercorp.fixturemonkey:fixture-monkey-jackson:$fixtureMonkeyVersion"
+    testImplementation "com.navercorp.fixturemonkey:fixture-monkey-javax-validation:$fixtureMonkeyVersion"
+    testImplementation "com.navercorp.fixturemonkey:fixture-monkey-mockito:$fixtureMonkeyVersion"
+    testImplementation "com.navercorp.fixturemonkey:fixture-monkey-starter:$fixtureMonkeyVersion"
+
+    // Datafaker
+    testImplementation "net.datafaker:datafaker:$dataFakerVersion"
+
+    // Jqwik
+    testImplementation "net.jqwik:jqwik:$jqwikVersion"
+    // Jqwik API
+    testImplementation "net.jqwik:jqwik-api:$jqwikVersion"
+    // Jqwik Engine
+    testImplementation "net.jqwik:jqwik-engine:$jqwikVersion"
+    // Jqwik Time
+    testImplementation "net.jqwik:jqwik-time:$jqwikVersion"
+    // Jqwik Testing
+    testImplementation "net.jqwik:jqwik-testing:$jqwikVersion"
+
+    // Awaitility
+    testImplementation "org.awaitility:awaitility:$awaitilityVersion"
+
+    // Embedded Redis
+    testImplementation "com.github.codemonstur:embedded-redis:$embeddedRedisVersion"
+
+    // == GreenMail Core ==
+    testImplementation "com.icegreen:greenmail:$greenMailVersion"
+    // == GreenMail Junit5 ==
+    testImplementation "com.icegreen:greenmail-junit5:$greenMailVersion"
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+def generatedDir = "src/main/generated"
+
+sourceSets {
+    main.java.srcDirs += generatedDir
+}
+
+tasks.compileJava {
+    options.generatedSourceOutputDirectory = file(generatedDir)
+}
+
+clean {
+    delete generatedDir
+}

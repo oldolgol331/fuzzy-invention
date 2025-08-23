@@ -3,18 +3,22 @@ package com.example.demo.domain.member.model;
 import static com.example.demo.domain.member.constant.MemberConst.EMAIL_PATTERN;
 import static com.example.demo.domain.member.constant.MemberConst.NICKNAME_PATTERN;
 import static com.example.demo.domain.member.model.MemberRole.USER;
+import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.example.demo.common.model.BaseAuditingEntity;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -77,6 +81,10 @@ public class Member extends BaseAuditingEntity {
     @Column(name = "deleted_at")
     @Builder.Default
     private LocalDateTime deletedAt = null;
+
+    @OneToMany(mappedBy = "member", cascade = REMOVE, orphanRemoval = true)
+    @Builder.Default
+    private List<OAuthConnection> oAuthConnections = new ArrayList<>();
 
     // ========================= Constructor Methods =========================
 

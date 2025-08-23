@@ -31,12 +31,14 @@ repositories {
 }
 
 // dependency versions
+def hibernateTypes55Version = "2.21.1"
 def springDocOpenApiUiVersion = "1.8.0"
 def querydslVersion = "5.0.0"
 def p6spyVersion = "1.8.1"
 def datasourceProxyVersion = "1.8.1"
 def jjwtVersion = "0.12.6"
 def redissonVersion = "3.50.0"
+def ulidCreatorVersion = "5.2.3"
 def javaxPersistenceApiVersion = "2.2"
 def jakartaValidationApiVersion = "3.1.1"
 def autoParamsVersion = "11.3.1"
@@ -61,6 +63,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.retry:spring-retry'
+
+    // Hibernate Types 55
+    implementation "com.vladmihalcea:hibernate-types-55:$hibernateTypes55Version"
+
+    // ULID Creator
+    implementation "com.github.f4b6a3:ulid-creator:$ulidCreatorVersion"
 
     // Jackson Datatype: JSR310
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'

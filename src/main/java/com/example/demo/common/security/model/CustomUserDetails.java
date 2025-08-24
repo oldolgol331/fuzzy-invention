@@ -1,9 +1,11 @@
 package com.example.demo.common.security.model;
 
+import static com.example.demo.domain.member.model.MemberStatus.ACTIVE;
+import static com.example.demo.domain.member.model.MemberStatus.BLOCKED;
 import static lombok.AccessLevel.PRIVATE;
 
 import com.example.demo.domain.member.model.MemberRole;
-import java.time.LocalDateTime;
+import com.example.demo.domain.member.model.MemberStatus;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.UUID;
@@ -30,26 +32,26 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class CustomUserDetails implements UserDetails {
 
     @Getter
-    private final UUID          id;
-    private final String        email;
-    private final String        password;
+    private final UUID         id;
+    private final String       email;
+    private final String       password;
     @Getter
-    private final MemberRole    role;
-    private final LocalDateTime deletedAt;
+    private final MemberRole   role;
+    private final MemberStatus status;
 
     public static CustomUserDetails of(
             final UUID id,
             final String email,
             final String password,
             final MemberRole role,
-            final LocalDateTime deletedAt
+            final MemberStatus status
     ) {
         return CustomUserDetails.builder()
                                 .id(id)
                                 .email(email)
                                 .password(password)
                                 .role(role)
-                                .deletedAt(deletedAt)
+                                .status(status)
                                 .build();
     }
 
@@ -75,7 +77,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !(status != ACTIVE && status == BLOCKED);
     }
 
     @Override
@@ -85,7 +87,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return deletedAt == null;
+        return status == ACTIVE;
     }
 
 }

@@ -28,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmailAndDeletedAtNotNull(username.toLowerCase())
+        Member member = memberRepository.findByEmail(username.toLowerCase())
                                         .orElseThrow(() -> new UsernameNotFoundException(
                                                 "회원이 존재하지 않습니다: " + username.toLowerCase()
                                         ));
@@ -37,7 +37,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 member.getEmail(),
                 member.getPassword(),
                 member.getMemberRole(),
-                member.getDeletedAt()
+                member.getMemberStatus()
         );
     }
 

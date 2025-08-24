@@ -3,6 +3,7 @@ package com.example.demo.domain.member.model;
 import static com.example.demo.domain.member.constant.MemberConst.EMAIL_PATTERN;
 import static com.example.demo.domain.member.constant.MemberConst.NICKNAME_PATTERN;
 import static com.example.demo.domain.member.model.MemberRole.USER;
+import static com.example.demo.domain.member.model.MemberStatus.ACTIVE;
 import static com.example.demo.domain.member.model.MemberStatus.DELETED;
 import static com.example.demo.domain.member.model.MemberStatus.INACTIVE;
 import static javax.persistence.CascadeType.REMOVE;
@@ -211,6 +212,23 @@ public class Member extends BaseAuditingEntity {
     public void setMemberRole(final MemberRole memberRole) {
         if (memberRole == null) throw new IllegalArgumentException("회원 권한은 필수입니다.");
         this.memberRole = memberRole;
+    }
+
+    /**
+     * 이메일 인증 완료 시 회원 상태를 활성화합니다.
+     */
+    public void completeEmailVerification() {
+        switch (memberStatus) {
+            case INACTIVE:
+                memberStatus = ACTIVE;
+                break;
+            case ACTIVE:
+                throw new IllegalStateException("이미 인증된 회원입니다.");
+            case DELETED:
+                throw new IllegalStateException("탈퇴한 회원입니다.");
+            case BLOCKED:
+                throw new IllegalStateException("차단된 회원입니다.");
+        }
     }
 
     /**

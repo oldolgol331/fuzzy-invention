@@ -3,6 +3,8 @@ package com.example.demo.domain.member.model;
 import static com.example.demo.domain.member.constant.MemberConst.EMAIL_PATTERN;
 import static com.example.demo.domain.member.constant.MemberConst.NICKNAME_PATTERN;
 import static com.example.demo.domain.member.model.MemberRole.USER;
+import static com.example.demo.domain.member.model.MemberStatus.DELETED;
+import static com.example.demo.domain.member.model.MemberStatus.INACTIVE;
 import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PRIVATE;
@@ -27,6 +29,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -78,6 +81,11 @@ public class Member extends BaseAuditingEntity {
     @Column(name = "role", nullable = false)
     private MemberRole memberRole;
 
+    @Enumerated(STRING)
+    @Column(name = "status", nullable = false)
+    @Setter
+    private MemberStatus memberStatus;
+
     @Column(name = "deleted_at")
     @Builder.Default
     private LocalDateTime deletedAt = null;
@@ -97,7 +105,7 @@ public class Member extends BaseAuditingEntity {
      * @return Member 객체
      */
     public static Member of(final String email, final String password, final String nickname) {
-        return of(email, password, nickname, USER);
+        return of(email, password, nickname, USER, INACTIVE);
     }
 
     /**
@@ -110,7 +118,11 @@ public class Member extends BaseAuditingEntity {
      * @return Member 객체
      */
     public static Member of(
-            final String email, final String password, final String nickname, final MemberRole memberRole
+            final String email,
+            final String password,
+            final String nickname,
+            final MemberRole memberRole,
+            final MemberStatus memberStatus
     ) {
         validateEmail(email);
         validatePassword(password);
@@ -120,6 +132,7 @@ public class Member extends BaseAuditingEntity {
                      .password(password)
                      .nickname(nickname)
                      .memberRole(memberRole)
+                     .memberStatus(memberStatus)
                      .build();
     }
 
@@ -204,7 +217,8 @@ public class Member extends BaseAuditingEntity {
      * 회원을 탈퇴 처리합니다. 회원의 탈퇴일을 현재 시간으로 설정합니다.
      */
     public void withdraw() {
-        if (deletedAt != null) throw new IllegalStateException("이미 탈퇴한 회원입니다.");
+        if (deletedAt != null || memberStatus == DELETED) throw new IllegalStateException("이미 탈퇴한 회원입니다.");
+        memberStatus = DELETED;
         deletedAt = LocalDateTime.now();
     }
 

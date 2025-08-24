@@ -1,5 +1,6 @@
 package com.example.demo.domain.member.dao;
 
+import com.example.demo.common.config.annotation.DataDBJpaRepositoryMarker;
 import com.example.demo.domain.member.model.OAuthConnection;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,5 +15,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * ---------------------------------------------------------------------------------------------------------------------
  * 25. 8. 23.    oldolgol331          Initial creation
  */
+@DataDBJpaRepositoryMarker
 public interface OAuthConnectionRepository extends JpaRepository<OAuthConnection, Long> {
 }

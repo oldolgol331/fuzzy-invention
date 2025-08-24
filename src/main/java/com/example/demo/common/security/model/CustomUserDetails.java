@@ -1,0 +1,91 @@
+package com.example.demo.common.security.model;
+
+import static lombok.AccessLevel.PRIVATE;
+
+import com.example.demo.domain.member.model.MemberRole;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+/**
+ * PackageName : com.example.demo.common.security.model
+ * FileName    : CustomUserDetails
+ * Author      : oldolgol331
+ * Date        : 25. 8. 24.
+ * Description :
+ * =====================================================================================================================
+ * DATE          AUTHOR               DESCRIPTION
+ * ---------------------------------------------------------------------------------------------------------------------
+ * 25. 8. 24.    oldolgol331          Initial creation
+ */
+@RequiredArgsConstructor(access = PRIVATE)
+@Builder(access = PRIVATE)
+public class CustomUserDetails implements UserDetails {
+
+    @Getter
+    private final UUID          id;
+    private final String        email;
+    private final String        password;
+    @Getter
+    private final MemberRole    role;
+    private final LocalDateTime deletedAt;
+
+    public static CustomUserDetails of(
+            final UUID id,
+            final String email,
+            final String password,
+            final MemberRole role,
+            final LocalDateTime deletedAt
+    ) {
+        return CustomUserDetails.builder()
+                                .id(id)
+                                .email(email)
+                                .password(password)
+                                .role(role)
+                                .deletedAt(deletedAt)
+                                .build();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority(role.getRoleValue()));
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return deletedAt == null;
+    }
+
+}

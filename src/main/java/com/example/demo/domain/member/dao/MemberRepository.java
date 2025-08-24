@@ -1,6 +1,7 @@
 package com.example.demo.domain.member.dao;
 
 import com.example.demo.domain.member.model.Member;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -16,4 +17,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * 25. 8. 23.    oldolgol331          Initial creation
  */
 public interface MemberRepository extends JpaRepository<Member, UUID> {
+
+    Optional<Member> findByEmail(String email);
+
+    Optional<Member> findByEmailAndDeletedAtNotNull(String email);
+
 }

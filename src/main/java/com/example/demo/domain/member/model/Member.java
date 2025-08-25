@@ -185,6 +185,17 @@ public class Member extends BaseAuditingEntity {
     // ========================= JPA Callback Methods =========================
 
     /**
+     * 이메일을 소문자로 변환하여 저장합니다.
+     */
+    @PrePersist
+    @PreUpdate
+    private void convertEmailToLowerCase() {
+        if (email != null) email = email.toLowerCase();
+    }
+
+    // ========================= Validation Methods =========================
+
+    /**
      * 이메일 유효성을 검사합니다.
      *
      * @param email - 이메일
@@ -193,8 +204,6 @@ public class Member extends BaseAuditingEntity {
         if (email == null || !EMAIL_PATTERN.matcher(email).matches())
             throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
     }
-
-    // ========================= Validation Methods =========================
 
     /**
      * 비밀번호 유효성을 검사합니다.
@@ -216,15 +225,6 @@ public class Member extends BaseAuditingEntity {
             throw new IllegalArgumentException("닉네임은 필수입니다.");
         if (!NICKNAME_PATTERN.matcher(nickname).matches())
             throw new IllegalArgumentException("닉네임 형식이 올바르지 않습니다. 2~15자 영문, 한글, 숫자, '-', '_'만 가능합니다.");
-    }
-
-    /**
-     * 이메일을 소문자로 변환하여 저장합니다.
-     */
-    @PrePersist
-    @PreUpdate
-    private void convertEmailToLowerCase() {
-        if (email != null) email = email.toLowerCase();
     }
 
     // ========================= Business Methods =========================

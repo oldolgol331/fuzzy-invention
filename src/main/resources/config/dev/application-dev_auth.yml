@@ -58,3 +58,7 @@ jwt:
   refresh-token:
     secret: ${JWT_REFRESH_TOKEN_SECRET:b281a4d6f98b453481a4d6f98b35340d1ba2c44cb94b44fea2c44cb94b44feb0194a682e60094e728a682e60098e72fec66764a006984d65a764a006981d65cc67f7325b2aa04ddfb7325b2aa07ddf678c3011ec468f4021b011ec468fb0210db2b4b0c4e29c462eb4b0c4e29c262e90331099de263a49e49099de263ad9e4b594fcf82627a34b42bcf82627a32b425bf5c0fa2da9204bb180fa2da9202bb10c}
     expiration-seconds: 1209600 # 14 days
+email:
+  verification:
+    token-expiry-minutes: 10
+    base-url: ${EMAIL_VERIFICATION_BASE_URL:http://localhost:8080/api/v1/members/verify-email?token=}

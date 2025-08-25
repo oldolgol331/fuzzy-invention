@@ -16,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -63,9 +64,11 @@ public class OAuthConnection extends BaseAuditingEntity {
     private Member member;
 
     @Column(name = "provider", nullable = false, updatable = false)
+    @NotBlank
     private String provider;
 
     @Column(name = "provider_id", nullable = false, updatable = false)
+    @NotBlank
     private String providerId;
 
     @Column(name = "deleted_at")
@@ -83,36 +86,12 @@ public class OAuthConnection extends BaseAuditingEntity {
      * @return OAuthConnection 객체
      */
     public static OAuthConnection of(final Member member, final String provider, final String providerId) {
-        validateProvider(provider);
-        validateProvider(providerId);
         OAuthConnection oAuthConnection = OAuthConnection.builder()
                                                          .provider(provider)
                                                          .providerId(providerId)
                                                          .build();
         oAuthConnection.setRelationshipWithMember(member);
         return oAuthConnection;
-    }
-
-    // ========================= Validation Methods =========================
-
-    /**
-     * OAuth2 제공자를 검사합니다.
-     *
-     * @param provider - OAuth2 제공자
-     */
-    private static void validateProvider(final String provider) {
-        if (provider == null || provider.trim().isEmpty())
-            throw new IllegalArgumentException("OAuth2 제공자는 필수입니다.");
-    }
-
-    /**
-     * OAuth2 제공자가 발급한 고유 식별자를 검사합니다.
-     *
-     * @param providerId - OAuth2 고유 식별자
-     */
-    private static void validateProviderId(final String providerId) {
-        if (providerId == null || providerId.trim().isEmpty())
-            throw new IllegalArgumentException("OAuth2 제공자가 발급한 고유 식별자는 필수입니다.");
     }
 
     // ========================= Relationship Methods =========================

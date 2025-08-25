@@ -82,24 +82,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
-     * 회원 상태를 검증합니다. 활성화(ACTIVE) 상태가 아닌 경우 예외가 발생합니다.
-     *
-     * @param member - 회원
-     */
-    private static void memberStatusCheck(final Member member) {
-        switch (member.getMemberStatus()) {
-            case INACTIVE:
-                throw new CustomException(MEMBER_INACTIVE);
-            case DELETED:
-                throw new CustomException(MEMBER_ALREADY_WITHDRAWN);
-            case BLOCKED:
-                throw new CustomException(MEMBER_BLOCKED);
-            default:
-                break;
-        }
-    }
-
-    /**
      * 회원 가입 요청을 처리합니다. 이메일 인증을 위한 토큰을 생성하고 이메일을 발송합니다.
      *
      * @param request - 회원 가입 요청 DTO
@@ -330,6 +312,24 @@ public class MemberServiceImpl implements MemberService {
 
         String verificationLink = verificationBaseUrl + verificationToken;
         emailService.sendVerificationEmail(member.getEmail(), verificationLink);
+    }
+
+    /**
+     * 회원 상태를 검증합니다. 활성화(ACTIVE) 상태가 아닌 경우 예외가 발생합니다.
+     *
+     * @param member - 회원
+     */
+    private void memberStatusCheck(final Member member) {
+        switch (member.getMemberStatus()) {
+            case INACTIVE:
+                throw new CustomException(MEMBER_INACTIVE);
+            case DELETED:
+                throw new CustomException(MEMBER_ALREADY_WITHDRAWN);
+            case BLOCKED:
+                throw new CustomException(MEMBER_BLOCKED);
+            default:
+                break;
+        }
     }
 
 }

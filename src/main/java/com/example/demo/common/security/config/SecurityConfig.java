@@ -23,8 +23,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -55,11 +53,6 @@ public class SecurityConfig {
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration)
     throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
@@ -67,88 +60,47 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
+        http.csrf(AbstractHttpConfigurer::disable)
 
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
 
-                .httpBasic(AbstractHttpConfigurer::disable)
+            .httpBasic(AbstractHttpConfigurer::disable)
 
-                .formLogin(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
 
-                .authorizeRequests(
-                        authorize -> authorize
-                                //Error & Swagger & Console
-                                .mvcMatchers(
-                                        "/error",
-                                        "/favicon.ico",
-                                        "/swagger-ui/**",
-                                        "/swagger-ui.html",
-                                        "/swagger-resources/**",
-                                        "/v3/api-docs/**",
-                                        "/h2-console/**"
-                                ).permitAll()
+            .authorizeRequests(authorize -> authorize
+                    //Error & Swagger & Console
+                    .mvcMatchers("/error", "/favicon.ico", "/swagger-ui/**", "/swagger-ui.html",
+                                 "/swagger-resources/**", "/v3/api-docs/**", "/h2-console/**").permitAll()
 
-                                //Auth
-                                .mvcMatchers(
-                                        POST,
-                                        "/api/v1/auth/signin",
-                                        "/api/v1/auth/refresh"
-                                ).permitAll()
-                                .mvcMatchers(
-                                        GET,
-                                        "/api/v1/auth/signout"
-                                ).authenticated()
+                    //Auth
+                    .mvcMatchers(POST, "/api/v1/auth/signin", "/api/v1/auth/refresh").permitAll()
+                    .mvcMatchers(GET, "/api/v1/auth/signout").authenticated()
 
-                                //Member
-                                .mvcMatchers(
-                                        GET,
-                                        "/api/v1/members/verify-email"
-                                ).permitAll()
-                                .mvcMatchers(
-                                        POST,
-                                        "/api/v1/members",
-                                        "/api/v1/members/verify-email-resend"
-                                ).permitAll()
-                                .mvcMatchers(
-                                        GET,
-                                        "/api/v1/members"
-                                ).authenticated()
-                                .mvcMatchers(
-                                        PUT,
-                                        "/api/v1/members"
-                                ).authenticated()
-                                .mvcMatchers(
-                                        PATCH,
-                                        "/api/v1/members"
-                                ).authenticated()
-                                .mvcMatchers(
-                                        DELETE,
-                                        "/api/v1/members"
-                                ).authenticated()
+                    //Member
+                    .mvcMatchers(GET, "/api/v1/members/verify-email").permitAll()
+                    .mvcMatchers(POST, "/api/v1/members", "/api/v1/members/verify-email-resend").permitAll()
+                    .mvcMatchers(GET, "/api/v1/members").authenticated().mvcMatchers(PUT, "/api/v1/members")
+                    .authenticated().mvcMatchers(PATCH, "/api/v1/members").authenticated()
+                    .mvcMatchers(DELETE, "/api/v1/members").authenticated()
 
-                                //Post
+                    //Post
 
-                                //Comment
+                    //Comment
 
-                                //ETC
-                                .anyRequest().authenticated()
-                )
+                    //ETC
+                    .anyRequest().authenticated())
 
-                .oauth2Login(
-                        oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
-                                        .successHandler(oAuth2AuthenticationSuccessHandler)
-                                        .failureHandler(oAuth2AuthenticationFailureHandler)
-                )
+            .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                                         .successHandler(oAuth2AuthenticationSuccessHandler)
+                                         .failureHandler(oAuth2AuthenticationFailureHandler))
 
-                .exceptionHandling(
-                        exception -> exception.authenticationEntryPoint(authenticationEntryPoint)
-                                              .accessDeniedHandler(accessDeniedHandler)
-                )
+            .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint)
+                                                     .accessDeniedHandler(accessDeniedHandler))
 
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

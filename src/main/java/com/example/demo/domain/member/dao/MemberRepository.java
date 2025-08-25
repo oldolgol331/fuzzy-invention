@@ -2,6 +2,7 @@ package com.example.demo.domain.member.dao;
 
 import com.example.demo.common.config.annotation.DataDBJpaRepositoryMarker;
 import com.example.demo.domain.member.model.Member;
+import com.example.demo.domain.member.model.MemberStatus;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,6 +23,10 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
 
     Optional<Member> findByEmail(String email);
 
-    Optional<Member> findByEmailAndDeletedAtNotNull(String email);
+    Optional<Member> findByEmailAndMemberStatusAndDeletedAtNull(String email, MemberStatus memberStatus);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByNickname(String nickname);
 
 }

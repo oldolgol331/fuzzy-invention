@@ -1,5 +1,7 @@
 package com.example.demo.common.security.service;
 
+import static com.example.demo.domain.member.model.MemberStatus.ACTIVE;
+
 import com.example.demo.common.security.model.CustomUserDetails;
 import com.example.demo.domain.member.dao.MemberRepository;
 import com.example.demo.domain.member.model.Member;
@@ -28,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(username.toLowerCase())
+        Member member = memberRepository.findByEmailAndMemberStatusAndDeletedAtNull(username.toLowerCase(), ACTIVE)
                                         .orElseThrow(() -> new UsernameNotFoundException(
                                                 "회원이 존재하지 않습니다: " + username.toLowerCase()
                                         ));

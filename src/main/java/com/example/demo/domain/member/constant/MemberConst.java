@@ -28,4 +28,7 @@ public class MemberConst {
     public static final Pattern PASSWORD_PATTERN = Pattern.compile(PASSWORD_REGEX);
     public static final Pattern NICKNAME_PATTERN = Pattern.compile(NICKNAME_REGEX);
 
+    public static final String VERIFICATION_KEY_PREFIX = "email-verification:";
+    public static final String RATE_LIMIT_KEY_PREFIX   = "rate-limit:resend-email:";
+
 }

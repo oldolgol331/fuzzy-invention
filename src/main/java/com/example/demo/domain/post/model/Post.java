@@ -121,4 +121,15 @@ public class Post extends BaseAuditingEntity {
         member.getPosts().add(this);
     }
 
+    // ========================= Business Methods =========================
+
+    /**
+     * 게시글을 삭제 처리합니다. 게시글의 삭제일을 현재 시간으로 설정합니다.
+     */
+    public void delete() {
+        if (deletedAt != null || isDeleted) throw new IllegalStateException("이미 삭제된 게시글입니다.");
+        isDeleted = true;
+        deletedAt = LocalDateTime.now();
+    }
+
 }

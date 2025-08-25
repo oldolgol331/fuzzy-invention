@@ -82,7 +82,7 @@ public class AuthController {
             @RequestHeader(JWT_ACCESS_TOKEN_HEADER_NAME) final String accessToken,
             HttpServletResponse response
     ) {
-        authService.signout(userDetails, accessToken);
+        authService.signout(userDetails, accessToken.substring(7));
 
         ResponseCookie cookie = ResponseCookie.from(JWT_REFRESH_TOKEN_COOKIE_NAME, null)
                                               .path("/")

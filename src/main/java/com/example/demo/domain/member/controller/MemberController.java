@@ -103,9 +103,11 @@ public class MemberController {
     @Operation(summary = "비밀번호 변경", description = "로그인된 회원의 비밀번호를 변경합니다.")
     public ResponseEntity<ApiResponse<Void>> changePassword(
             @AuthenticationPrincipal final CustomUserDetails userDetails,
+            @RequestHeader(JWT_ACCESS_TOKEN_HEADER_NAME) final String accessToken,
             @Valid @RequestBody final MemberPasswordUpdateRequest request
     ) {
         memberService.changePassword(userDetails.getId(), request);
+        authService.signout(userDetails, accessToken.substring(7));
         return ResponseEntity.ok(ApiResponse.success(PASSWORD_CHANGED_SUCCESS));
     }
 
@@ -120,7 +122,7 @@ public class MemberController {
             memberService.withdrawMember(userDetails.getId(), request);
         else
             memberService.withdrawMember(userDetails.getId());
-        authService.signout(userDetails, accessToken);
+        authService.signout(userDetails, accessToken.substring(7));
         return ResponseEntity.ok(ApiResponse.success(MEMBER_WITHDRAWN_SUCCESS));
     }
 

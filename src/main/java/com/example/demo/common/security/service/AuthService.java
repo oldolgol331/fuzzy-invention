@@ -86,7 +86,7 @@ public class AuthService {
 
         if (!refreshToken.equals(refreshTokenFromRedis)) throw new CustomException(TOKEN_MISMATCH);
 
-        Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(refreshToken);
+        Authentication authentication = jwtTokenProvider.getAuthenticationFromRefreshToken(refreshToken);
         return jwtTokenProvider.generateAccessToken(authentication);
     }
 

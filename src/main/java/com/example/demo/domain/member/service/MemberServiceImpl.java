@@ -9,6 +9,7 @@ import static com.example.demo.common.response.ErrorCode.MEMBER_BLOCKED;
 import static com.example.demo.common.response.ErrorCode.MEMBER_INACTIVE;
 import static com.example.demo.common.response.ErrorCode.MEMBER_NOT_FOUND;
 import static com.example.demo.common.response.ErrorCode.NICKNAME_DUPLICATION;
+import static com.example.demo.common.response.ErrorCode.OAUTH_PROVIDER_NOT_SUPPORTED;
 import static com.example.demo.common.response.ErrorCode.PASSWORD_MISMATCH;
 import static com.example.demo.common.response.ErrorCode.TOO_MANY_REQUESTS;
 import static com.example.demo.domain.member.constant.MemberConst.RATE_LIMIT_KEY_PREFIX;
@@ -16,18 +17,22 @@ import static com.example.demo.domain.member.constant.MemberConst.VERIFICATION_K
 import static com.example.demo.domain.member.model.MemberStatus.ACTIVE;
 import static com.example.demo.domain.member.model.MemberStatus.BLOCKED;
 import static com.example.demo.domain.member.model.MemberStatus.DELETED;
+import static com.example.demo.domain.member.model.MemberStatus.INACTIVE;
 
 import com.example.demo.common.error.CustomException;
 import com.example.demo.common.mail.EmailService;
 import com.example.demo.domain.member.dao.MemberRepository;
+import com.example.demo.domain.member.dao.OAuthConnectionRepository;
 import com.example.demo.domain.member.dto.MemberRequest.MemberPasswordUpdateRequest;
 import com.example.demo.domain.member.dto.MemberRequest.MemberSignUpRequest;
 import com.example.demo.domain.member.dto.MemberRequest.MemberUpdateRequest;
 import com.example.demo.domain.member.dto.MemberRequest.MemberWithdrawRequest;
 import com.example.demo.domain.member.dto.MemberResponse.MemberInfoResponse;
 import com.example.demo.domain.member.model.Member;
+import com.example.demo.domain.member.model.OAuthConnection;
 import com.example.demo.infra.redis.dao.RedisRepository;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,16 +54,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
 
-    private final MemberRepository memberRepository;
-    private final RedisRepository  redisRepository;
-    private final PasswordEncoder  passwordEncoder;
-    private final EmailService     emailService;
+    private final MemberRepository          memberRepository;
+    private final OAuthConnectionRepository oAuthConnectionRepository;
+    private final RedisRepository           redisRepository;
+    private final PasswordEncoder           passwordEncoder;
+    private final EmailService              emailService;
 
     private final long   tokenExpiryMinutes;
     private final String verificationBaseUrl;
 
     public MemberServiceImpl(
             final MemberRepository memberRepository,
+            final OAuthConnectionRepository oAuthConnectionRepository,
             final RedisRepository redisRepository,
             final PasswordEncoder passwordEncoder,
             final EmailService emailService,
@@ -66,6 +73,7 @@ public class MemberServiceImpl implements MemberService {
             @Value("${email.verification.base-url}") final String verificationBaseUrl
     ) {
         this.memberRepository = memberRepository;
+        this.oAuthConnectionRepository = oAuthConnectionRepository;
         this.redisRepository = redisRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
@@ -115,6 +123,43 @@ public class MemberServiceImpl implements MemberService {
         sendVerificationEmailWithToken(member);
 
         return MemberInfoResponse.from(member);
+    }
+
+    /**
+     * OAuth 제공자로부터 회원 정보를 저장하거나, 이미 존재하는 경우 기존 회원에 OAuth 연동을 추가합니다.
+     *
+     * @param provider          - OAuth 제공자
+     * @param providerId        - OAuth 고유 식별자
+     * @param emailFromOAuth    - OAuth 제공자로부터 받은 이메일
+     * @param nicknameFromOAuth - OAuth 제공자로부터 받은 닉네임
+     * @return 회원 엔티티
+     */
+    @Transactional
+    @Override
+    public Member findOrCreateMemberForOAuth(
+            final String provider, final String providerId, final String emailFromOAuth, final String nicknameFromOAuth
+    ) {
+        Optional<Member> opMember = memberRepository.findByProviderAndProviderId(provider, providerId);
+        if (opMember.isPresent()) return opMember.get();
+
+        if (emailFromOAuth != null && !emailFromOAuth.trim().isEmpty()) {
+            Optional<Member> opMemberFromEmail = memberRepository.findByEmail(emailFromOAuth);
+            if (opMemberFromEmail.isPresent()) {
+                Member memberToLink = opMemberFromEmail.get();
+                oAuthConnectionRepository.save(OAuthConnection.of(memberToLink, provider, providerId));
+                if (memberToLink.getMemberStatus() == INACTIVE) memberToLink.completeEmailVerification();
+                return memberToLink;
+            }
+        }
+
+        String newNickname = nicknameFromOAuth;
+        if (memberRepository.existsByNickname(newNickname))
+            newNickname = "user-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+
+        Member savedMember = memberRepository.save(Member.of(emailFromOAuth, newNickname, provider, providerId));
+        oAuthConnectionRepository.save(OAuthConnection.of(savedMember, provider, providerId));
+
+        return savedMember;
     }
 
     /**
@@ -178,10 +223,11 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public MemberInfoResponse getMemberInfoById(final UUID memberId) {
-        Member member = memberRepository.findById(memberId)
-                                        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
-        memberStatusCheck(member);
-        return MemberInfoResponse.from(member);
+//        Member member = memberRepository.findById(memberId)
+//                                        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+//        memberStatusCheck(member);
+//        return MemberInfoResponse.from(member);
+        return memberRepository.getMemberInfoResponseByIdAndStatus(memberId, ACTIVE);
     }
 
     /**
@@ -235,10 +281,23 @@ public class MemberServiceImpl implements MemberService {
         member.setPassword(passwordEncoder.encode(request.getNewPassword()));
     }
 
-    // ========================= Private Methods =========================
+    /**
+     * OAuth 회원을 탈퇴 처리합니다. 회원의 탈퇴일을 현재 시간으로 설정하고, 회원 상태를 탈퇴 상태(DELETE)로 변경합니다.
+     *
+     * @param memberId - 회원 ID
+     */
+    @Transactional
+    @Override
+    public void withdrawMember(final UUID memberId) {
+        Member member = memberRepository.findById(memberId)
+                                        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+        memberStatusCheck(member);
+        if (member.getOAuthConnections().isEmpty()) throw new CustomException(OAUTH_PROVIDER_NOT_SUPPORTED);
+        member.withdraw();
+    }
 
     /**
-     * 회원 탈퇴를 처리합니다. 회원의 탈퇴일을 현재 시간으로 설정하고, 회원 상태를 탈퇴 상태(DELETE)로 변경합니다.
+     * 이메일 회원을 탈퇴 처리합니다. 회원의 탈퇴일을 현재 시간으로 설정하고, 회원 상태를 탈퇴 상태(DELETE)로 변경합니다.
      *
      * @param memberId - 회원 ID
      * @param request  - 회원 탈퇴 요청 DTO
@@ -248,9 +307,13 @@ public class MemberServiceImpl implements MemberService {
     public void withdrawMember(final UUID memberId, final MemberWithdrawRequest request) {
         Member member = memberRepository.findById(memberId)
                                         .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+        if (!passwordEncoder.matches(request.getCurrentPassword(), member.getPassword()))
+            throw new CustomException(INVALID_PASSWORD);
         memberStatusCheck(member);
         member.withdraw();
     }
+
+    // ========================= Private Methods =========================
 
     /**
      * 인증 메일을 발송합니다.

@@ -98,7 +98,20 @@ public class Member extends BaseAuditingEntity {
     // ========================= Constructor Methods =========================
 
     /**
-     * Member 객체 생성
+     * Member 객체 생성(OAuth)
+     *
+     * @param email      - 이메일
+     * @param nickname   - 닉네임
+     * @param provider   - OAuth 제공자
+     * @param providerId - OAuth 고유 식별자
+     * @return Member 객체
+     */
+    public static Member of(final String email, final String nickname, final String provider, final String providerId) {
+        return of(email, nickname, provider, providerId, USER, ACTIVE);
+    }
+
+    /**
+     * Member 객체 생성(Email + Password)
      *
      * @param email    - 이메일
      * @param password - 비밀번호
@@ -110,12 +123,44 @@ public class Member extends BaseAuditingEntity {
     }
 
     /**
-     * Member 객체 생성
+     * Member 객체 생성(OAuth)
      *
-     * @param email      - 이메일
-     * @param password   - 비밀번호
-     * @param nickname   - 닉네임
-     * @param memberRole - 회원 권한
+     * @param email        - 이메일
+     * @param nickname     - 닉네임
+     * @param provider     - OAuth 제공자
+     * @param providerId   - OAuth 고유 식별자
+     * @param memberRole   - 회원 권한
+     * @param memberStatus - 회원 상태
+     * @return Member 객체
+     */
+    public static Member of(
+            final String email,
+            final String nickname,
+            final String provider,
+            final String providerId,
+            final MemberRole memberRole,
+            final MemberStatus memberStatus
+    ) {
+        if (provider == null || provider.trim().isEmpty() || providerId == null || providerId.trim().isEmpty())
+            throw new IllegalArgumentException("OAuth 제공자 및 고유 식별자는 필수입니다.");
+        validateEmail(email);
+        validateNickname(nickname);
+        return Member.builder()
+                     .email(email.toLowerCase())
+                     .nickname(nickname)
+                     .memberRole(memberRole)
+                     .memberStatus(memberStatus)
+                     .build();
+    }
+
+    /**
+     * Member 객체 생성(Email + Password)
+     *
+     * @param email        - 이메일
+     * @param password     - 비밀번호
+     * @param nickname     - 닉네임
+     * @param memberRole   - 회원 권한
+     * @param memberStatus - 회원 상태
      * @return Member 객체
      */
     public static Member of(

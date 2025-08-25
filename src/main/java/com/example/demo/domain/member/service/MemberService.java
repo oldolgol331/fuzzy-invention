@@ -5,6 +5,7 @@ import com.example.demo.domain.member.dto.MemberRequest.MemberSignUpRequest;
 import com.example.demo.domain.member.dto.MemberRequest.MemberUpdateRequest;
 import com.example.demo.domain.member.dto.MemberRequest.MemberWithdrawRequest;
 import com.example.demo.domain.member.dto.MemberResponse.MemberInfoResponse;
+import com.example.demo.domain.member.model.Member;
 import java.util.UUID;
 
 /**
@@ -22,6 +23,10 @@ public interface MemberService {
 
     MemberInfoResponse signUpEmailUser(MemberSignUpRequest request);
 
+    Member findOrCreateMemberForOAuth(
+            String provider, String providerId, String emailFromOAuth, String nicknameFromOAuth
+    );
+
     void resendVerificationEmail(String email);
 
     MemberInfoResponse verifyEmail(String token);
@@ -31,6 +36,8 @@ public interface MemberService {
     MemberInfoResponse updateMemberInfo(UUID memberId, MemberUpdateRequest request);
 
     void changePassword(UUID memberId, MemberPasswordUpdateRequest request);
+
+    void withdrawMember(UUID memberId);
 
     void withdrawMember(UUID memberId, MemberWithdrawRequest request);
 

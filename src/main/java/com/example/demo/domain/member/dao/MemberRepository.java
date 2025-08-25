@@ -19,7 +19,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * 25. 8. 23.    oldolgol331          Initial creation
  */
 @DataDBJpaRepositoryMarker
-public interface MemberRepository extends JpaRepository<Member, UUID> {
+public interface MemberRepository extends JpaRepository<Member, UUID>, MemberRepositoryCustom {
 
     Optional<Member> findByEmail(String email);
 

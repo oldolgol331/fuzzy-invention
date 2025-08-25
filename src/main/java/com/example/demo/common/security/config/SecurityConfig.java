@@ -1,10 +1,18 @@
 package com.example.demo.common.security.config;
 
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PATCH;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import com.example.demo.common.security.entrypoint.CustomAuthenticationEntryPoint;
 import com.example.demo.common.security.handler.CustomAccessDeniedHandler;
 import com.example.demo.common.security.jwt.filter.JwtAuthenticationFilter;
+import com.example.demo.common.security.oauth.handler.OAuth2AuthenticationFailureHandler;
+import com.example.demo.common.security.oauth.handler.OAuth2AuthenticationSuccessHandler;
+import com.example.demo.common.security.oauth.service.CustomOAuth2UserService;
 import java.util.Arrays;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +47,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter        jwtAuthenticationFilter;
-    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-    private final CustomAccessDeniedHandler      accessDeniedHandler;
+    private final JwtAuthenticationFilter            jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint     authenticationEntryPoint;
+    private final CustomAccessDeniedHandler          accessDeniedHandler;
+    private final CustomOAuth2UserService            oAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -81,8 +92,42 @@ public class SecurityConfig {
                                 ).permitAll()
 
                                 //Auth
+                                .mvcMatchers(
+                                        POST,
+                                        "/api/v1/auth/signin",
+                                        "/api/v1/auth/refresh"
+                                ).permitAll()
+                                .mvcMatchers(
+                                        GET,
+                                        "/api/v1/auth/signout"
+                                ).authenticated()
 
                                 //Member
+                                .mvcMatchers(
+                                        GET,
+                                        "/api/v1/members/verify-email"
+                                ).permitAll()
+                                .mvcMatchers(
+                                        POST,
+                                        "/api/v1/members",
+                                        "/api/v1/members/verify-email-resend"
+                                ).permitAll()
+                                .mvcMatchers(
+                                        GET,
+                                        "/api/v1/members"
+                                ).authenticated()
+                                .mvcMatchers(
+                                        PUT,
+                                        "/api/v1/members"
+                                ).authenticated()
+                                .mvcMatchers(
+                                        PATCH,
+                                        "/api/v1/members"
+                                ).authenticated()
+                                .mvcMatchers(
+                                        DELETE,
+                                        "/api/v1/members"
+                                ).authenticated()
 
                                 //Post
 
@@ -90,6 +135,12 @@ public class SecurityConfig {
 
                                 //ETC
                                 .anyRequest().authenticated()
+                )
+
+                .oauth2Login(
+                        oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                                        .failureHandler(oAuth2AuthenticationFailureHandler)
                 )
 
                 .exceptionHandling(

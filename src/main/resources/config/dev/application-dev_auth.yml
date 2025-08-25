@@ -62,3 +62,6 @@ email:
   verification:
     token-expiry-minutes: 10
     base-url: ${EMAIL_VERIFICATION_BASE_URL:http://localhost:8080/api/v1/members/verify-email?token=}
+frontend:
+  oauth2:
+    authorized-redirect-uri: ${FRONTEND_OAUTH2_REDIRECT_URI:http://localhost:3000/oauth/callback}

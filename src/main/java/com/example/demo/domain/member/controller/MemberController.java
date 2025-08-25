@@ -7,10 +7,12 @@ import static com.example.demo.common.response.SuccessCode.MEMBER_REGISTER_SUCCE
 import static com.example.demo.common.response.SuccessCode.MEMBER_WITHDRAWN_SUCCESS;
 import static com.example.demo.common.response.SuccessCode.PASSWORD_CHANGED_SUCCESS;
 import static com.example.demo.common.response.SuccessCode.UPDATE_MEMBER_INFO_SUCCESS;
+import static com.example.demo.common.security.constant.SecurityConst.JWT_ACCESS_TOKEN_HEADER_NAME;
 
 import com.example.demo.common.response.ApiResponse;
 import com.example.demo.common.response.SuccessCode;
 import com.example.demo.common.security.model.CustomUserDetails;
+import com.example.demo.common.security.service.AuthService;
 import com.example.demo.domain.member.dto.MemberRequest.MemberPasswordUpdateRequest;
 import com.example.demo.domain.member.dto.MemberRequest.MemberSignUpRequest;
 import com.example.demo.domain.member.dto.MemberRequest.MemberUpdateRequest;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,6 +53,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final AuthService   authService;
 
     @PostMapping
     @Operation(summary = "회원 가입", description = "아이디(이메일)와 비밀번호로 회원 가입을 합니다.")
@@ -109,9 +113,14 @@ public class MemberController {
     @Operation(summary = "회원 탈퇴", description = "로그인된 회원의 상태를 탈퇴로 변경합니다.")
     public ResponseEntity<ApiResponse<Void>> withdraw(
             @AuthenticationPrincipal final CustomUserDetails userDetails,
-            @Valid @RequestBody final MemberWithdrawRequest request
+            @Valid @RequestBody(required = false) final MemberWithdrawRequest request,
+            @RequestHeader(JWT_ACCESS_TOKEN_HEADER_NAME) final String accessToken
     ) {
-        memberService.withdrawMember(userDetails.getId(), request);
+        if (request != null && (request.getCurrentPassword() != null && !request.getCurrentPassword().trim().isEmpty()))
+            memberService.withdrawMember(userDetails.getId(), request);
+        else
+            memberService.withdrawMember(userDetails.getId());
+        authService.signout(userDetails, accessToken);
         return ResponseEntity.ok(ApiResponse.success(MEMBER_WITHDRAWN_SUCCESS));
     }
 

@@ -67,3 +67,10 @@ jwt:
   refresh-token:
     secret: ${JWT_REFRESH_TOKEN_SECRET}
     expiration-seconds: 1209600 # 14 days
+email:
+  verification:
+    token-expiry-minutes: 10
+    base-url: ${EMAIL_VERIFICATION_BASE_URL}
+frontend:
+  oauth2:
+    authorized-redirect-uri: ${FRONTEND_OAUTH2_REDIRECT_URI}

@@ -21,9 +21,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @DataDBJpaRepositoryMarker
 public interface MemberRepository extends JpaRepository<Member, UUID>, MemberRepositoryCustom {
 
+    Optional<Member> findByIdAndMemberStatus(UUID id, MemberStatus memberStatus);
+
     Optional<Member> findByEmail(String email);
 
     Optional<Member> findByEmailAndMemberStatusAndDeletedAtNull(String email, MemberStatus memberStatus);
+
+    boolean existsByIdAndMemberStatus(UUID id, MemberStatus memberStatus);
 
     boolean existsByEmail(String email);
 

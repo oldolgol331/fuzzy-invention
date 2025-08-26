@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor(access = PRIVATE)
 public enum ErrorCode {
 
-    //Common
+    // Common
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "CO001", "유효하지 않은 입력 값입니다."),
     INVALID_TYPE_VALUE(HttpStatus.BAD_REQUEST, "CO002", "유효하지 않은 타입 값입니다."),
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "CO003", "해당 엔티티를 찾을 수 없습니다."),
@@ -36,7 +36,7 @@ public enum ErrorCode {
     TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "CO012", "너무 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CO999", "서버 내부 오류가 발생했습니다. 관리자에게 문의하세요."),
 
-    //Member & Auth
+    // Member & Auth
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "ME001", "해당 회원을 찾을 수 없습니다."),
     EMAIL_DUPLICATION(HttpStatus.CONFLICT, "ME002", "이미 사용 중인 이메일입니다."),
     NICKNAME_DUPLICATION(HttpStatus.CONFLICT, "ME003", "이미 사용 중인 닉네임입니다."),
@@ -52,7 +52,14 @@ public enum ErrorCode {
     AUTH_TYPE_NOT_SUPPORTED(HttpStatus.BAD_REQUEST, "ME013", "지원하지 않는 인증 타입입니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "ME013", "JWT RefreshToken이 유효하지 않습니다."),
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "ME014", "JWT RefreshToken이 만료되었습니다."),
-    TOKEN_MISMATCH(HttpStatus.UNAUTHORIZED, "ME015", "JWT 토큰이 일치하지 않습니다.");
+    TOKEN_MISMATCH(HttpStatus.UNAUTHORIZED, "ME015", "JWT 토큰이 일치하지 않습니다."),
+
+    // Post & PostLike
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "PO001", "해당 게시글을 찾을 수 없습니다."),
+    POST_NOT_A_WRITER(HttpStatus.BAD_REQUEST, "PO002", "해당 게시글의 작성자가 아닙니다."),
+    POST_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "PL001", "해당 게시글 좋아요를 찾을 수 없습니다."),
+    POST_LIKE_ALREADY_EXISTS(HttpStatus.CONFLICT, "PL002", "이미 좋아요가 추가된 게시글입니다."),
+    POST_LIKE_CANNOT_ADD(HttpStatus.BAD_REQUEST, "PL003", "해당 게시글의 작성자는 좋아요를 추가할 수 없습니다.");
 
     private final HttpStatus status;
     private final String     code;

@@ -2,6 +2,8 @@ package com.example.demo.domain.post.dao;
 
 import com.example.demo.common.config.annotation.DataDBJpaRepositoryMarker;
 import com.example.demo.domain.post.model.Post;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -17,4 +19,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 @DataDBJpaRepositoryMarker
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
+
+    Optional<Post> findByIdAndIsDeletedFalse(Long id);
+
+    Optional<Post> findByIdAndWriterIdAndIsDeletedFalse(Long id, UUID writerId);
+
+    boolean existsByIdAndIsDeletedFalse(Long id);
+
 }

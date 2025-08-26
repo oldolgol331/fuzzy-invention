@@ -21,6 +21,7 @@ import com.example.demo.domain.member.dto.MemberRequest.ResendVerificationEmailR
 import com.example.demo.domain.member.dto.MemberResponse.MemberInfoResponse;
 import com.example.demo.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
+@Tag(name = "회원 API", description = "회원 가입, 정보 조회/수정, 탈퇴 API를 제공합니다.")
 public class MemberController {
 
     private final MemberService memberService;

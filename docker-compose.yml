@@ -14,10 +14,10 @@ services:
       TZ: ${MYSQL_TIME_ZONE}
     ports:
       - ${MYSQL_HOST_PORT}:${MYSQL_CONTAINER_PORT}
-    #volumes:
-      #- ./mysql/data:/var/lib/mysql
-      #- ./mysql/conf.d:/etc/mysql/conf.d
-      #- ./mysql/log:/var/log/mysql
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/conf.d:/etc/mysql/conf.d
+      - ./mysql/log:/var/log/mysql
   redis:
     image: redis:6
     container_name: demo-redis

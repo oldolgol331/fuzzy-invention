@@ -87,6 +87,11 @@ public class SecurityConfig {
                     .mvcMatchers(DELETE, "/api/v1/members").authenticated()
 
                     //Post
+                    .mvcMatchers(POST, "/api/v1/posts").authenticated()
+                    .mvcMatchers(GET, "/api/v1/posts", "/api/v1/posts/{id}").permitAll()
+                    .mvcMatchers(PUT, "/api/v1/posts/{id}").authenticated()
+                    .mvcMatchers(DELETE, "/api/v1/posts/{id}").authenticated()
+                    .mvcMatchers(PATCH, "/api/v1/posts/{id}").authenticated()
 
                     //Comment
 

@@ -51,7 +51,8 @@ CREATE TABLE posts
     updated_at DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
     deleted_at DATETIME         NULL COMMENT '삭제 일시',
     CONSTRAINT PK_posts PRIMARY KEY (post_id),
-    CONSTRAINT FK_posts_members FOREIGN KEY (member_id) REFERENCES members (member_id)
+    CONSTRAINT FK_posts_members FOREIGN KEY (member_id) REFERENCES members (member_id),
+    FULLTEXT INDEX IDX_fulltext_posts_title_content (title, content) WITH PARSER ngram
 ) COMMENT '게시글 테이블';
 
 CREATE TABLE post_likes

@@ -58,8 +58,7 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "PO001", "해당 게시글을 찾을 수 없습니다."),
     POST_NOT_A_WRITER(HttpStatus.BAD_REQUEST, "PO002", "해당 게시글의 작성자가 아닙니다."),
     POST_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "PL001", "해당 게시글 좋아요를 찾을 수 없습니다."),
-    POST_LIKE_ALREADY_EXISTS(HttpStatus.CONFLICT, "PL002", "이미 좋아요가 추가된 게시글입니다."),
-    POST_LIKE_CANNOT_ADD(HttpStatus.BAD_REQUEST, "PL003", "해당 게시글의 작성자는 좋아요를 추가할 수 없습니다.");
+    POST_LIKE_CANNOT(HttpStatus.BAD_REQUEST, "PL002", "해당 게시글의 작성자는 좋아요를 추가할 수 없습니다.");
 
     private final HttpStatus status;
     private final String     code;

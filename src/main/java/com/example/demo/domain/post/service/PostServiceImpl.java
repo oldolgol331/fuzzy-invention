@@ -1,8 +1,7 @@
 package com.example.demo.domain.post.service;
 
 import static com.example.demo.common.response.ErrorCode.MEMBER_NOT_FOUND;
-import static com.example.demo.common.response.ErrorCode.POST_LIKE_ALREADY_EXISTS;
-import static com.example.demo.common.response.ErrorCode.POST_LIKE_CANNOT_ADD;
+import static com.example.demo.common.response.ErrorCode.POST_LIKE_CANNOT;
 import static com.example.demo.common.response.ErrorCode.POST_NOT_FOUND;
 import static com.example.demo.domain.member.model.MemberStatus.ACTIVE;
 
@@ -148,7 +147,7 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 게시글에 좋아요를 추가합니다.
+     * 게시글에 좋아요를 추가하거나 추가된 좋아요를 취소합니다.
      *
      * @param postId   - 게시글 ID
      * @param writerId - 회원 ID
@@ -156,17 +155,17 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional
     @Override
-    public PostDetailResponse addLike(final Long postId, final UUID writerId) {
+    public PostDetailResponse likePost(final Long postId, final UUID writerId) {
         Member member = memberRepository.findByIdAndMemberStatus(writerId, ACTIVE)
                                         .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
         Post post = postRepository.findByIdAndIsDeletedFalse(postId)
                                   .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
 
-        if (post.getWriter().getId().equals(writerId)) throw new CustomException(POST_LIKE_CANNOT_ADD);
-        if (postLikeRepository.existsById(PostLikeId.builder().memberId(writerId).postId(postId).build()))
-            throw new CustomException(POST_LIKE_ALREADY_EXISTS);
+        if (post.getWriter().getId().equals(writerId)) throw new CustomException(POST_LIKE_CANNOT);
 
-        postLikeRepository.save(PostLike.of(member, post));
+        PostLikeId postLikeId = PostLikeId.builder().memberId(writerId).postId(postId).build();
+        if (postLikeRepository.existsById(postLikeId)) postLikeRepository.deleteById(postLikeId);
+        else postLikeRepository.save(PostLike.of(member, post));
 
         return PostDetailResponse.builder()
                                  .id(post.getId())

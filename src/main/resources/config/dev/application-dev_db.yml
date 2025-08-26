@@ -44,6 +44,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
         #dialect: org.hibernate.dialect.MySQL8Dialect
+        #dialect: com.example.demo.common.config.dialect.CustomMySQLDialect
         default_batch_fetch_size: 100
         jdbc:
           batch_size: 100

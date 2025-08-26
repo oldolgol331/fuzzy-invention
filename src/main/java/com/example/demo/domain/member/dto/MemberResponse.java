@@ -75,28 +75,6 @@ public class MemberResponse {
             this.updatedAt = updatedAt;
         }
 
-        public static MemberInfoResponse of(
-                final UUID id,
-                final String email,
-                final String nickname,
-                final MemberRole role,
-                final MemberStatus status,
-                final List<String> providers,
-                final LocalDateTime createdAt,
-                final LocalDateTime updatedAt
-        ) {
-            return MemberInfoResponse.builder()
-                                     .id(id)
-                                     .email(email)
-                                     .nickname(nickname)
-                                     .role(role)
-                                     .status(status)
-                                     .providers(providers)
-                                     .createdAt(createdAt)
-                                     .updatedAt(updatedAt)
-                                     .build();
-        }
-
         public static MemberInfoResponse from(final Member member) {
             if (member == null) return null;
             return MemberInfoResponse.builder()

@@ -10,9 +10,9 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 import com.example.demo.common.security.entrypoint.CustomAuthenticationEntryPoint;
 import com.example.demo.common.security.handler.CustomAccessDeniedHandler;
 import com.example.demo.common.security.jwt.filter.JwtAuthenticationFilter;
-import com.example.demo.common.security.oauth.handler.OAuth2AuthenticationFailureHandler;
-import com.example.demo.common.security.oauth.handler.OAuth2AuthenticationSuccessHandler;
-import com.example.demo.common.security.oauth.service.CustomOAuth2UserService;
+import com.example.demo.infra.security.oauth.handler.OAuth2AuthenticationFailureHandler;
+import com.example.demo.infra.security.oauth.handler.OAuth2AuthenticationSuccessHandler;
+import com.example.demo.infra.security.oauth.service.CustomOAuth2UserService;
 import java.util.Arrays;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;

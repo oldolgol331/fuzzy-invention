@@ -8,6 +8,7 @@ import static com.example.demo.common.response.SuccessCode.COMMENT_WRITE_SUCCESS
 
 import com.example.demo.common.response.ApiResponse;
 import com.example.demo.common.response.SuccessCode;
+import com.example.demo.common.response.annotation.CustomPageResponse;
 import com.example.demo.common.security.model.CustomUserDetails;
 import com.example.demo.common.util.PageableUtils;
 import com.example.demo.domain.comment.dto.CommentRequest.CommentCreateRequest;
@@ -68,17 +69,24 @@ public class CommentController {
     }
 
     @GetMapping("/{postId}")
+    @CustomPageResponse(
+            numberOfElements = false,
+            empty = false,
+            hasContent = false
+    )
     @Operation(summary = "댓글 목록 조회", description = "특정 게시글의 댓글 목록을 조회합니다.")
     public ResponseEntity<ApiResponse<Page<CommentListResponse>>> getPosts(
             @PathVariable("postId") final Long postId,
             @RequestParam(value = "page", required = false, defaultValue = "1") @Min(1) final int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") @Min(1) final int size,
-            @RequestParam(value = "sort", required = false, defaultValue = "createdAt,DESC") final String sort,
+            @RequestParam(value = "sort", required = false, defaultValue = "createdAt,ASC") final String sort,
             @AuthenticationPrincipal final CustomUserDetails userDetails
     ) {
-        Sort                      orders       = PageableUtils.parseSort(sort);
-        PageRequest               pageRequest  = PageRequest.of(page - 1, size, orders);
-        Page<CommentListResponse> responseData = commentService.getComments(postId, userDetails.getId(), pageRequest);
+        Sort        orders      = PageableUtils.parseSort(sort);
+        PageRequest pageRequest = PageRequest.of(page - 1, size, orders);
+        Page<CommentListResponse> responseData = commentService.getComments(
+                postId, userDetails != null ? userDetails.getId() : null, pageRequest
+        );
         return ResponseEntity.ok(ApiResponse.success(COMMENT_LIST_READ_SUCCESS, responseData));
     }
 

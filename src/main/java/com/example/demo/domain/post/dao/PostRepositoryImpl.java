@@ -62,7 +62,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                               POST.isDeleted,
                                               POST.createdAt,
                                               POST.updatedAt,
-                                              POST.writer.id.eq(MEMBER.id)
+                                              POST.writer.id.eq(writerId)
                                       )
                               )
                               .from(POST)

@@ -150,20 +150,20 @@ public class PostServiceImpl implements PostService {
      * 게시글에 좋아요를 추가하거나 추가된 좋아요를 취소합니다.
      *
      * @param postId   - 게시글 ID
-     * @param writerId - 회원 ID
+     * @param memberId - 회원 ID
      * @return 게시글 상세 정보 응답 DTO
      */
     @Transactional
     @Override
-    public PostDetailResponse likePost(final Long postId, final UUID writerId) {
-        Member member = memberRepository.findByIdAndMemberStatus(writerId, ACTIVE)
+    public PostDetailResponse likePost(final Long postId, final UUID memberId) {
+        Member member = memberRepository.findByIdAndMemberStatus(memberId, ACTIVE)
                                         .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
         Post post = postRepository.findByIdAndIsDeletedFalse(postId)
                                   .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
 
-        if (post.getWriter().getId().equals(writerId)) throw new CustomException(POST_LIKE_CANNOT);
+        if (post.getWriter().getId().equals(memberId)) throw new CustomException(POST_LIKE_CANNOT);
 
-        PostLikeId postLikeId = PostLikeId.builder().memberId(writerId).postId(postId).build();
+        PostLikeId postLikeId = PostLikeId.builder().memberId(memberId).postId(postId).build();
         if (postLikeRepository.existsById(postLikeId)) postLikeRepository.deleteById(postLikeId);
         else postLikeRepository.save(PostLike.of(member, post));
 

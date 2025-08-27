@@ -31,6 +31,6 @@ public interface PostService {
 
     void deletePost(Long postId, UUID writerId);
 
-    PostDetailResponse likePost(Long postId, UUID writerId);
+    PostDetailResponse likePost(Long postId, UUID memberId);
 
 }

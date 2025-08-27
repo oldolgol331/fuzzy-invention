@@ -94,6 +94,11 @@ public class SecurityConfig {
                     .mvcMatchers(PATCH, "/api/v1/posts/{id}").authenticated()
 
                     //Comment
+                    .mvcMatchers(POST, "/api/v1/comments/{postId}").authenticated()
+                    .mvcMatchers(GET, "/api/v1/comments/{postId}").permitAll()
+                    .mvcMatchers(PUT, "/api/v1/comments/{postId}").authenticated()
+                    .mvcMatchers(DELETE, "/api/v1/comments/{postId}").authenticated()
+                    .mvcMatchers(PATCH, "/api/v1/comments/{postId}").authenticated()
 
                     //ETC
                     .anyRequest().authenticated())

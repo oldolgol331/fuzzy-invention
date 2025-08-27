@@ -7,6 +7,7 @@ import com.example.demo.domain.member.model.QMember;
 import com.example.demo.domain.post.model.QPost;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
@@ -60,7 +61,9 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                                                                            COMMENT.isDeleted,
                                                                            COMMENT.createdAt,
                                                                            COMMENT.updatedAt,
-                                                                           COMMENT.writer.id.eq(writerId)
+                                                                           writerId != null
+                                                                           ? COMMENT.writer.id.eq(writerId)
+                                                                           : Expressions.constant(Boolean.FALSE)
                                                                    )
                                                            )
                                                            .from(COMMENT)
@@ -107,7 +110,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                 }
             });
 
-        if (!hasCreatedAt) orderSpecifiers.add(new OrderSpecifier(Order.DESC, COMMENT.createdAt));
+        if (!hasCreatedAt) orderSpecifiers.add(new OrderSpecifier(Order.ASC, COMMENT.createdAt));
 
         return orderSpecifiers.toArray(new OrderSpecifier[0]);
     }

@@ -79,7 +79,9 @@ public class PostController {
             @PathVariable("id") @Min(1) final Long postId,
             final HttpServletRequest request
     ) {
-        PostDetailResponse responseData = postService.getPostDetailById(postId, userDetails.getId());
+        PostDetailResponse responseData = postService.getPostDetailById(
+                postId, userDetails != null ? userDetails.getId() : null
+        );
         postViewCountService.incrementViewCount(postId, getClientIp(request));
         return ResponseEntity.ok(ApiResponse.success(POST_READ_SUCCESS, responseData));
     }

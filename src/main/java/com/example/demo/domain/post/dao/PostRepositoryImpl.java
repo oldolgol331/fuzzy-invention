@@ -62,7 +62,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                               POST.isDeleted,
                                               POST.createdAt,
                                               POST.updatedAt,
-                                              POST.writer.id.eq(writerId)
+                                              writerId != null
+                                              ? POST.writer.id.eq(writerId)
+                                              : Expressions.constant(Boolean.FALSE)
                                       )
                               )
                               .from(POST)

@@ -1,4 +1,4 @@
-package com.example.demo.common.security.oauth.profile;
+package com.example.demo.infra.security.oauth.profile;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * PackageName : com.example.demo.common.security.oauth.profile
+ * PackageName : com.example.demo.infra.security.oauth.profile
  * FileName    : OAuthProfile
  * Author      : oldolgol331
  * Date        : 25. 8. 25.

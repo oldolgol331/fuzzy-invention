@@ -1,4 +1,4 @@
-package com.example.demo.common.security.oauth.profile;
+package com.example.demo.infra.security.oauth.profile;
 
 import static com.example.demo.common.response.ErrorCode.OAUTH_PROVIDER_NOT_SUPPORTED;
 import static lombok.AccessLevel.PRIVATE;
@@ -8,7 +8,7 @@ import java.util.Map;
 import lombok.NoArgsConstructor;
 
 /**
- * PackageName : com.example.demo.common.security.oauth.profile
+ * PackageName : com.example.demo.infra.security.oauth.profile
  * FileName    : OAuthProfileFactory
  * Author      : oldolgol331
  * Date        : 25. 8. 25.

@@ -1,10 +1,10 @@
-package com.example.demo.common.security.oauth.service;
+package com.example.demo.infra.security.oauth.service;
 
 import com.example.demo.common.security.model.CustomUserDetails;
-import com.example.demo.common.security.oauth.profile.OAuthProfile;
-import com.example.demo.common.security.oauth.profile.OAuthProfileFactory;
 import com.example.demo.domain.member.model.Member;
 import com.example.demo.domain.member.service.MemberService;
+import com.example.demo.infra.security.oauth.profile.OAuthProfile;
+import com.example.demo.infra.security.oauth.profile.OAuthProfileFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 /**
- * PackageName : com.example.demo.common.security.oauth.service
+ * PackageName : com.example.demo.infra.security.oauth.service
  * FileName    : CustomOAuth2UserService
  * Author      : oldolgol331
  * Date        : 25. 8. 25.

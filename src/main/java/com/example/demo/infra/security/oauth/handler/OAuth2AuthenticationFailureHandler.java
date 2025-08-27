@@ -1,4 +1,4 @@
-package com.example.demo.common.security.oauth.handler;
+package com.example.demo.infra.security.oauth.handler;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * PackageName : com.example.demo.common.security.oauth.handler
+ * PackageName : com.example.demo.infra.security.oauth.handler
  * FileName    : OAuth2AuthenticationFailureHandler
  * Author      : oldolgol331
  * Date        : 25. 8. 25.

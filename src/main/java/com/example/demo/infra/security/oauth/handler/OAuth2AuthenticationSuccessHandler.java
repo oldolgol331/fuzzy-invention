@@ -1,4 +1,4 @@
-package com.example.demo.common.security.oauth.handler;
+package com.example.demo.infra.security.oauth.handler;
 
 import static com.example.demo.common.security.constant.SecurityConst.JWT_ACCESS_TOKEN_HEADER_NAME;
 import static com.example.demo.common.security.constant.SecurityConst.JWT_REFRESH_TOKEN_COOKIE_NAME;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * PackageName : com.example.demo.common.security.oauth.handler
+ * PackageName : com.example.demo.infra.security.oauth.handler
  * FileName    : OAuth2AuthenticationSuccessHandler
  * Author      : oldolgol331
  * Date        : 25. 8. 25.

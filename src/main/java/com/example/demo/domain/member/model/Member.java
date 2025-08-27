@@ -12,6 +12,8 @@ import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.example.demo.common.model.BaseAuditingEntity;
+import com.example.demo.domain.comment.model.Comment;
+import com.example.demo.domain.comment.model.CommentLike;
 import com.example.demo.domain.post.model.Post;
 import com.example.demo.domain.post.model.PostLike;
 import java.time.LocalDateTime;
@@ -104,6 +106,14 @@ public class Member extends BaseAuditingEntity {
     @OneToMany(mappedBy = "member", cascade = REMOVE, orphanRemoval = true)
     @Builder.Default
     private List<PostLike> postLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "writer", cascade = REMOVE, orphanRemoval = true)
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = REMOVE, orphanRemoval = true)
+    @Builder.Default
+    private List<CommentLike> commentLikes = new ArrayList<>();
 
     // ========================= Constructor Methods =========================
 

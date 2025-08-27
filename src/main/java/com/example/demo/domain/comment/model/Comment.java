@@ -1,4 +1,4 @@
-package com.example.demo.domain.post.model;
+package com.example.demo.domain.comment.model;
 
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -6,8 +6,8 @@ import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.example.demo.common.model.BaseAuditingEntity;
-import com.example.demo.domain.comment.model.Comment;
 import com.example.demo.domain.member.model.Member;
+import com.example.demo.domain.post.model.Post;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,49 +29,47 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * PackageName : com.example.demo.domain.post.model
- * FileName    : Post
+ * PackageName : com.example.demo.domain.comment.model
+ * FileName    : Comment
  * Author      : oldolgol331
- * Date        : 25. 8. 25.
+ * Date        : 25. 8. 27.
  * Description :
  * =====================================================================================================================
  * DATE          AUTHOR               DESCRIPTION
  * ---------------------------------------------------------------------------------------------------------------------
- * 25. 8. 25.    oldolgol331          Initial creation
+ * 25. 8. 27.    oldolgol331          Initial creation
  */
 @Entity
-@Table(name = "posts")
+@Table(name = "comments")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PRIVATE)
 @Builder(access = PRIVATE)
-public class Post extends BaseAuditingEntity {
+public class Comment extends BaseAuditingEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "post_id", nullable = false, updatable = false)
+    @Column(name = "comment_id", nullable = false, updatable = false)
     private Long id;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(
             name = "member_id", nullable = false, updatable = false,
-            foreignKey = @ForeignKey(name = "FK_posts_members")
+            foreignKey = @ForeignKey(name = "FK_comments_members")
     )
     private Member writer;
 
-    @Column(name = "title", nullable = false)
-    @Setter
-    @NotBlank
-    private String title;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(
+            name = "post_id", nullable = false, updatable = false,
+            foreignKey = @ForeignKey(name = "FK_comments_posts")
+    )
+    private Post post;
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     @Setter
     @NotBlank
     private String content;
-
-    @Column(name = "view_count", nullable = false)
-    @Builder.Default
-    private Long viewCount = 0L;
 
     @Column(name = "like_count", nullable = false)
     @Builder.Default
@@ -85,23 +83,19 @@ public class Post extends BaseAuditingEntity {
     @Builder.Default
     private LocalDateTime deletedAt = null;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "comment")
     @Builder.Default
-    private List<PostLike> postLikes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post")
-    @Builder.Default
-    private List<Comment> comments = new ArrayList<>();
+    private List<CommentLike> commentLikes = new ArrayList<>();
 
     // ========================= Constructor Methods =========================
 
-    public static Post of(final Member writer, final String title, final String content) {
-        Post post = Post.builder()
-                        .title(title)
-                        .content(content)
-                        .build();
-        post.setRelationshipWithMember(writer);
-        return post;
+    public static Comment of(final Member writer, final Post post, final String content) {
+        Comment comment = Comment.builder()
+                                 .content(content)
+                                 .build();
+        comment.setRelationshipWithMember(writer);
+        comment.setRelationshipWithPost(post);
+        return comment;
     }
 
     // ========================= JPA Callback Methods =========================
@@ -111,7 +105,7 @@ public class Post extends BaseAuditingEntity {
      */
     @PreUpdate
     private void updateLikeCount() {
-        likeCount = postLikes.size();
+        likeCount = commentLikes.size();
     }
 
     // ========================= Relationship Methods =========================
@@ -123,16 +117,26 @@ public class Post extends BaseAuditingEntity {
      */
     private void setRelationshipWithMember(final Member member) {
         this.writer = member;
-        member.getPosts().add(this);
+        member.getComments().add(this);
+    }
+
+    /**
+     * 게시글과의 관계를 설정합니다.
+     *
+     * @param post - 게시글
+     */
+    private void setRelationshipWithPost(final Post post) {
+        this.post = post;
+        post.getComments().add(this);
     }
 
     // ========================= Business Methods =========================
 
     /**
-     * 게시글을 삭제 처리합니다. 게시글의 삭제일을 현재 시간으로 설정합니다.
+     * 댓글을 삭제 처리합니다. 댓글의 삭제일을 현재 시간으로 설정합니다.
      */
     public void delete() {
-        if (deletedAt != null || isDeleted) throw new IllegalStateException("이미 삭제된 게시글입니다.");
+        if (deletedAt != null || isDeleted) throw new IllegalStateException("이미 삭제된 댓글입니다.");
         isDeleted = true;
         deletedAt = LocalDateTime.now();
     }

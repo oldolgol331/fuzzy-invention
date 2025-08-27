@@ -125,7 +125,7 @@ public class PostController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "게시글 좋아요 추가/취소", description = "특정 게시글에 좋아요를 추가 또는 좋아료를 취소합니다.")
+    @Operation(summary = "게시글 좋아요 추가/취소", description = "특정 게시글에 좋아요를 추가 또는 좋아요를 취소합니다.")
     public ResponseEntity<ApiResponse<PostDetailResponse>> likePost(
             @PathVariable("id") @Min(1) final Long postId,
             @AuthenticationPrincipal final CustomUserDetails userDetails

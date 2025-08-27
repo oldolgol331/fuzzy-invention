@@ -45,7 +45,14 @@ public enum SuccessCode {
     POST_LIST_SEARCH_SUCCESS(HttpStatus.OK, "성공적으로 게시글 목록을 검색했습니다."),
     POST_UPDATE_SUCCESS(HttpStatus.OK, "성공적으로 게시글을 수정했습니다."),
     POST_DELETE_SUCCESS(HttpStatus.OK, "성공적으로 게시글을 삭제했습니다."),
-    POST_LIKE_SUCCESS(HttpStatus.OK, "성공적으로 게시글을 좋아요를 추가했습니다.");
+    POST_LIKE_SUCCESS(HttpStatus.OK, "성공적으로 게시글에 좋아요를 추가/취소했습니다."),
+
+    // Comment & CommentLike
+    COMMENT_WRITE_SUCCESS(HttpStatus.CREATED, "성공적으로 댓글을 작성했습니다."),
+    COMMENT_LIST_READ_SUCCESS(HttpStatus.OK, "성공적으로 댓글 목록을 조회했습니다."),
+    COMMENT_UPDATE_SUCCESS(HttpStatus.OK, "성공적으로 댓글을 수정했습니다."),
+    COMMENT_DELETE_SUCCESS(HttpStatus.OK, "성공적으로 댓글을 삭제했습니다."),
+    COMMENT_LIKE_SUCCESS(HttpStatus.OK, "성공적으로 댓글에 좋아요를 추가/취소했습니다.");
 
     private final HttpStatus status;
     private final String     message;

@@ -48,6 +48,8 @@ public class PostResponse {
         private final LocalDateTime createdAt;
         @Schema(name = "최종 수정 일시")
         private final LocalDateTime updatedAt;
+        @Schema(name = "댓글 수")
+        private final Integer       commentCount;
 
         @Builder
         @QueryProjection
@@ -60,7 +62,8 @@ public class PostResponse {
                 final Integer likeCount,
                 final Boolean isDeleted,
                 final LocalDateTime createdAt,
-                final LocalDateTime updatedAt
+                final LocalDateTime updatedAt,
+                final Integer commentCount
         ) {
             this.id = id;
             this.writerId = writerId;
@@ -71,6 +74,7 @@ public class PostResponse {
             this.isDeleted = isDeleted;
             this.createdAt = createdAt;
             this.updatedAt = updatedAt;
+            this.commentCount = commentCount;
         }
 
         public static PostListResponse from(final Post post) {
@@ -85,6 +89,7 @@ public class PostResponse {
                                    .isDeleted(post.getIsDeleted())
                                    .createdAt(post.getCreatedAt())
                                    .updatedAt(post.getUpdatedAt())
+                                   .commentCount(post.getComments().size())
                                    .build();
         }
 
@@ -114,6 +119,8 @@ public class PostResponse {
         private final LocalDateTime createdAt;
         @Schema(name = "최종 수정 일시")
         private final LocalDateTime updatedAt;
+        @Schema(name = "댓글 수")
+        private final Integer       commentCount;
         @Schema(name = "작성자 여부")
         private final boolean       isWriter;
 
@@ -130,6 +137,7 @@ public class PostResponse {
                 final Boolean isDeleted,
                 final LocalDateTime createdAt,
                 final LocalDateTime updatedAt,
+                final Integer commentCount,
                 final boolean isWriter
         ) {
             this.id = id;
@@ -142,6 +150,7 @@ public class PostResponse {
             this.isDeleted = isDeleted;
             this.createdAt = createdAt;
             this.updatedAt = updatedAt;
+            this.commentCount = commentCount;
             this.isWriter = isWriter;
         }
 

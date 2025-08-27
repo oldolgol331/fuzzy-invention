@@ -1,5 +1,6 @@
 package com.example.demo.domain.post.dao;
 
+import com.example.demo.domain.comment.model.QComment;
 import com.example.demo.domain.member.model.QMember;
 import com.example.demo.domain.post.dto.PostResponse.PostDetailResponse;
 import com.example.demo.domain.post.dto.PostResponse.PostListResponse;
@@ -37,8 +38,9 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
 
-    private static final QPost   POST   = QPost.post;
-    private static final QMember MEMBER = QMember.member;
+    private static final QPost    POST    = QPost.post;
+    private static final QMember  MEMBER  = QMember.member;
+    private static final QComment COMMENT = QComment.comment;
 
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -62,6 +64,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                               POST.isDeleted,
                                               POST.createdAt,
                                               POST.updatedAt,
+                                              COMMENT.id.count().intValue(),
                                               writerId != null
                                               ? POST.writer.id.eq(writerId)
                                               : Expressions.constant(Boolean.FALSE)
@@ -69,7 +72,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                               )
                               .from(POST)
                               .join(POST.writer, MEMBER)
-                              .where(POST.id.eq(postId))
+                              .join(POST.comments, COMMENT)
+                              .where(POST.id.eq(postId), POST.id.eq(COMMENT.post.id))
                               .fetchOne();
     }
 
@@ -101,12 +105,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                                                         POST.likeCount,
                                                                         POST.isDeleted,
                                                                         POST.createdAt,
-                                                                        POST.updatedAt
+                                                                        POST.updatedAt,
+                                                                        COMMENT.id.count().intValue()
                                                                 )
                                                         )
                                                         .from(POST)
                                                         .join(POST.writer, MEMBER)
-                                                        .where(POST.id.in(postIds))
+                                                        .join(POST.comments, COMMENT)
+                                                        .where(POST.id.in(postIds), POST.id.eq(COMMENT.post.id))
                                                         .orderBy(getSortCondition(pageable))
                                                         .fetch();
 

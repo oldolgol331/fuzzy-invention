@@ -92,6 +92,7 @@ public class SecurityConfig {
                     .mvcMatchers(PUT, "/api/v1/posts/{id}").authenticated()
                     .mvcMatchers(DELETE, "/api/v1/posts/{id}").authenticated()
                     .mvcMatchers(PATCH, "/api/v1/posts/{id}").authenticated()
+                    .mvcMatchers(POST, "/api/v1/posts/batch").hasAuthority("ROLE_ADMIN")
 
                     //Comment
                     .mvcMatchers(POST, "/api/v1/comments/{postId}").authenticated()

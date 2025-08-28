@@ -1,5 +1,8 @@
 package com.example.demo.domain.post.service;
 
+import static com.example.demo.common.event.type.ChangeType.CREATED;
+import static com.example.demo.common.event.type.ChangeType.DELETED;
+import static com.example.demo.common.event.type.ChangeType.UPDATED;
 import static com.example.demo.common.response.ErrorCode.MEMBER_NOT_FOUND;
 import static com.example.demo.common.response.ErrorCode.POST_LIKE_CANNOT;
 import static com.example.demo.common.response.ErrorCode.POST_NOT_FOUND;
@@ -14,11 +17,13 @@ import com.example.demo.domain.post.dto.PostRequest.PostCreateRequest;
 import com.example.demo.domain.post.dto.PostRequest.PostUpdateRequest;
 import com.example.demo.domain.post.dto.PostResponse.PostDetailResponse;
 import com.example.demo.domain.post.dto.PostResponse.PostListResponse;
+import com.example.demo.domain.post.event.event.PostChangedEvent;
 import com.example.demo.domain.post.model.Post;
 import com.example.demo.domain.post.model.PostLike;
 import com.example.demo.domain.post.model.PostLikeId;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,9 +45,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
-    private final PostRepository     postRepository;
-    private final PostLikeRepository postLikeRepository;
-    private final MemberRepository   memberRepository;
+    private final PostRepository            postRepository;
+    private final PostLikeRepository        postLikeRepository;
+    private final MemberRepository          memberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 새로운 게시글을 생성합니다.
@@ -57,6 +63,9 @@ public class PostServiceImpl implements PostService {
         Member writer = memberRepository.findByIdAndMemberStatus(writerId, ACTIVE)
                                         .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
         Post savedPost = postRepository.save(Post.of(writer, request.getTitle(), request.getContent()));
+
+        eventPublisher.publishEvent(PostChangedEvent.of(savedPost.getId(), CREATED));
+
         return PostDetailResponse.builder()
                                  .id(savedPost.getId())
                                  .writerId(writer.getId())
@@ -115,6 +124,8 @@ public class PostServiceImpl implements PostService {
         post.setTitle(request.getNewTitle());
         post.setContent(request.getNewContent());
 
+        eventPublisher.publishEvent(PostChangedEvent.of(postId, UPDATED));
+
         return PostDetailResponse.builder()
                                  .id(post.getId())
                                  .writerId(post.getWriter().getId())
@@ -143,6 +154,9 @@ public class PostServiceImpl implements PostService {
 
         Post post = postRepository.findByIdAndWriterIdAndIsDeletedFalse(postId, writerId)
                                   .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+
+        eventPublisher.publishEvent(PostChangedEvent.of(postId, DELETED));
+
         post.delete();
     }
 
@@ -166,6 +180,8 @@ public class PostServiceImpl implements PostService {
         PostLikeId postLikeId = PostLikeId.builder().memberId(memberId).postId(postId).build();
         if (postLikeRepository.existsById(postLikeId)) postLikeRepository.deleteById(postLikeId);
         else postLikeRepository.save(PostLike.of(member, post));
+
+        eventPublisher.publishEvent(PostChangedEvent.of(postId, UPDATED));
 
         return PostDetailResponse.builder()
                                  .id(post.getId())

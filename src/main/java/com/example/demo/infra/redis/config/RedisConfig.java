@@ -1,4 +1,4 @@
-package com.example.demo.infra.config;
+package com.example.demo.infra.redis.config;
 
 import static com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.NON_FINAL;
 
@@ -17,7 +17,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * PackageName : com.example.demo.infra.config
+ * PackageName : com.example.demo.infra.redis.config
  * FileName    : RedisConfig
  * Author      : oldolgol331
  * Date        : 25. 8. 24.

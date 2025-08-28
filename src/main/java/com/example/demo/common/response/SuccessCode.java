@@ -46,6 +46,7 @@ public enum SuccessCode {
     POST_UPDATE_SUCCESS(HttpStatus.OK, "성공적으로 게시글을 수정했습니다."),
     POST_DELETE_SUCCESS(HttpStatus.OK, "성공적으로 게시글을 삭제했습니다."),
     POST_LIKE_SUCCESS(HttpStatus.OK, "성공적으로 게시글에 좋아요를 추가/취소했습니다."),
+    POST_BATCH_SYNC_SUCCESS(HttpStatus.OK, "성공적으로 게시글 스케줄러(DB -> ES)를 실행했습니다."),
 
     // Comment & CommentLike
     COMMENT_WRITE_SUCCESS(HttpStatus.CREATED, "성공적으로 댓글을 작성했습니다."),

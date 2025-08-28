@@ -72,8 +72,20 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                               )
                               .from(POST)
                               .join(POST.writer, MEMBER)
-                              .join(POST.comments, COMMENT)
-                              .where(POST.id.eq(postId), POST.id.eq(COMMENT.post.id))
+                              .leftJoin(POST.comments, COMMENT)
+                              .where(POST.id.eq(postId))
+                              .groupBy(
+                                      POST.id,
+                                      MEMBER.id,
+                                      MEMBER.nickname,
+                                      POST.title,
+                                      POST.content,
+                                      POST.viewCount,
+                                      POST.likeCount,
+                                      POST.isDeleted,
+                                      POST.createdAt,
+                                      POST.updatedAt
+                              )
                               .fetchOne();
     }
 
@@ -111,8 +123,20 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                                         )
                                                         .from(POST)
                                                         .join(POST.writer, MEMBER)
-                                                        .join(POST.comments, COMMENT)
-                                                        .where(POST.id.in(postIds), POST.id.eq(COMMENT.post.id))
+                                                        .leftJoin(POST.comments, COMMENT)
+                                                        .where(POST.id.in(postIds))
+                                                        .groupBy(
+                                                                POST.id,
+                                                                MEMBER.id,
+                                                                MEMBER.nickname,
+                                                                POST.title,
+                                                                POST.content,
+                                                                POST.viewCount,
+                                                                POST.likeCount,
+                                                                POST.isDeleted,
+                                                                POST.createdAt,
+                                                                POST.updatedAt
+                                                        )
                                                         .orderBy(getSortCondition(pageable))
                                                         .fetch();
 

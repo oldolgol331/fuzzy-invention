@@ -36,7 +36,7 @@ import org.springframework.transaction.support.AbstractPlatformTransactionManage
  */
 @Configuration
 @EnableJpaRepositories(
-        basePackages = "com.example.demo.domain",
+        basePackages = "com.example.demo.common",
         includeFilters = @ComponentScan.Filter(
                 type = ANNOTATION, classes = MetaDBJpaRepositoryMarker.class
         ),
@@ -71,7 +71,7 @@ public class MetaDBConfig {
     ) {
         LocalContainerEntityManagerFactoryBean emFactory = new LocalContainerEntityManagerFactoryBean();
         emFactory.setDataSource(metaDBSource);
-        emFactory.setPackagesToScan("com.example.demo.infra");
+        emFactory.setPackagesToScan("com.example.demo.common");
         emFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         Map<String, Object> properties = new HashMap<>();

@@ -64,7 +64,10 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "CO001", "해당 댓글을 찾을 수 없습니다."),
     COMMENT_NOT_A_WRITER(HttpStatus.BAD_REQUEST, "CO002", "해당 댓글의 작성자가 아닙니다."),
     COMMENT_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "CL001", "해당 댓글 좋아요를 찾을 수 없습니다."),
-    COMMENT_LIKE_CANNOT(HttpStatus.BAD_REQUEST, "CL002", "해당 댓글의 작성자는 좋아요를 추가할 수 없습니다.");
+    COMMENT_LIKE_CANNOT(HttpStatus.BAD_REQUEST, "CL002", "해당 댓글의 작성자는 좋아요를 추가할 수 없습니다."),
+
+    // JobMetaData
+    JOB_METADATA_NOT_FOUND(HttpStatus.NOT_FOUND, "JM001", "해당 JobMetaData를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String     code;

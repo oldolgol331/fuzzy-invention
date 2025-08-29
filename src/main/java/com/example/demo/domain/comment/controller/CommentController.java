@@ -10,7 +10,6 @@ import com.example.demo.common.response.ApiResponse;
 import com.example.demo.common.response.SuccessCode;
 import com.example.demo.common.response.annotation.CustomPageResponse;
 import com.example.demo.common.security.model.CustomUserDetails;
-import com.example.demo.common.util.PageableUtils;
 import com.example.demo.domain.comment.dto.CommentRequest.CommentCreateRequest;
 import com.example.demo.domain.comment.dto.CommentRequest.CommentUpdateRequest;
 import com.example.demo.domain.comment.dto.CommentResponse.CommentListResponse;
@@ -18,11 +17,12 @@ import com.example.demo.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -77,15 +76,15 @@ public class CommentController {
     @Operation(summary = "댓글 목록 조회", description = "특정 게시글의 댓글 목록을 조회합니다.")
     public ResponseEntity<ApiResponse<Page<CommentListResponse>>> getPosts(
             @PathVariable("postId") final Long postId,
-            @RequestParam(value = "page", required = false, defaultValue = "1") @Min(1) final int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") @Min(1) final int size,
-            @RequestParam(value = "sort", required = false, defaultValue = "createdAt,ASC") final String sort,
+            @PageableDefault(
+                    page = 1, size = 10, sort = "createdAt", direction = Sort.Direction.DESC
+            ) final Pageable pageable,
             @AuthenticationPrincipal final CustomUserDetails userDetails
     ) {
-        Sort        orders      = PageableUtils.parseSort(sort);
-        PageRequest pageRequest = PageRequest.of(page - 1, size, orders);
         Page<CommentListResponse> responseData = commentService.getComments(
-                postId, userDetails != null ? userDetails.getId() : null, pageRequest
+                postId,
+                userDetails != null ? userDetails.getId() : null,
+                PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort())
         );
         return ResponseEntity.ok(ApiResponse.success(COMMENT_LIST_READ_SUCCESS, responseData));
     }

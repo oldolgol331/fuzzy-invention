@@ -11,7 +11,6 @@ import com.example.demo.common.response.ApiResponse;
 import com.example.demo.common.response.SuccessCode;
 import com.example.demo.common.response.annotation.CustomPageResponse;
 import com.example.demo.common.security.model.CustomUserDetails;
-import com.example.demo.common.util.PageableUtils;
 import com.example.demo.domain.post.dto.PostRequest.PostCreateRequest;
 import com.example.demo.domain.post.dto.PostRequest.PostUpdateRequest;
 import com.example.demo.domain.post.dto.PostResponse.PostDetailResponse;
@@ -26,7 +25,9 @@ import javax.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -94,14 +95,14 @@ public class PostController {
     )
     @Operation(summary = "게시글 목록 조회", description = "특정 키워드를 포함한 게시글 목록을 조회합니다.")
     public ResponseEntity<ApiResponse<Page<PostListResponse>>> getPosts(
-            @RequestParam(value = "page", required = false, defaultValue = "1") @Min(1) final int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") @Min(1) final int size,
-            @RequestParam(value = "sort", required = false, defaultValue = "createdAt,DESC") final String sort,
-            @RequestParam(value = "keyword", required = false) final String keyword
+            @RequestParam(value = "keyword", required = false) final String keyword,
+            @PageableDefault(
+                    page = 1, size = 10, sort = "createdAt", direction = Sort.Direction.DESC
+            ) final Pageable pageable
     ) {
-        Sort                   orders       = PageableUtils.parseSort(sort);
-        PageRequest            pageRequest  = PageRequest.of(page - 1, size, orders);
-        Page<PostListResponse> responseData = postService.getPosts(keyword, pageRequest);
+        Page<PostListResponse> responseData = postService.getPosts(
+                keyword, PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort())
+        );
         return ResponseEntity.ok(ApiResponse.success(POST_LIST_SEARCH_SUCCESS, responseData));
     }
 

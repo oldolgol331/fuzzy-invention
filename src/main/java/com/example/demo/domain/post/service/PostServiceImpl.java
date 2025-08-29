@@ -21,6 +21,7 @@ import com.example.demo.domain.post.event.event.PostChangedEvent;
 import com.example.demo.domain.post.model.Post;
 import com.example.demo.domain.post.model.PostLike;
 import com.example.demo.domain.post.model.PostLikeId;
+import com.example.demo.infra.elasticsearch.post.dao.PostSearchRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -49,6 +50,7 @@ public class PostServiceImpl implements PostService {
     private final PostLikeRepository        postLikeRepository;
     private final MemberRepository          memberRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final PostSearchRepository      postSearchRepository;
 
     /**
      * 새로운 게시글을 생성합니다.
@@ -102,7 +104,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Page<PostListResponse> getPosts(final String keyword, final Pageable pageable) {
-        return postRepository.getPosts(keyword, pageable);
+        return postSearchRepository.getPosts(keyword, pageable);
     }
 
     /**

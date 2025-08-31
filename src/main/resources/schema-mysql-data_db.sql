@@ -40,16 +40,17 @@ CREATE TABLE oauth_connections
 
 CREATE TABLE posts
 (
-    post_id    BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT COMMENT '게시글 고유 식별자',
-    member_id  BINARY(16)       NOT NULL COMMENT '작성한 회원 ID',
-    title      VARCHAR(255)     NOT NULL COMMENT '게시글 제목',
-    content    TEXT             NOT NULL COMMENT '게시글 내용',
-    view_count BIGINT UNSIGNED  NOT NULL DEFAULT 0 COMMENT '조회수',
-    like_count INTEGER UNSIGNED NOT NULL DEFAULT 0 COMMENT '추천수',
-    is_deleted TINYINT(1)       NOT NULL DEFAULT 0 COMMENT '삭제 여부',
-    created_at DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 일시',
-    updated_at DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
-    deleted_at DATETIME         NULL COMMENT '삭제 일시',
+    post_id       BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT COMMENT '게시글 고유 식별자',
+    member_id     BINARY(16)       NOT NULL COMMENT '작성한 회원 ID',
+    title         VARCHAR(255)     NOT NULL COMMENT '게시글 제목',
+    content       TEXT             NOT NULL COMMENT '게시글 내용',
+    view_count    BIGINT UNSIGNED  NOT NULL DEFAULT 0 COMMENT '조회수',
+    like_count    INTEGER UNSIGNED NOT NULL DEFAULT 0 COMMENT '추천수',
+    comment_count INTEGER UNSIGNED NOT NULL DEFAULT 0 COMMENT '댓글 수',
+    is_deleted    TINYINT(1)       NOT NULL DEFAULT 0 COMMENT '삭제 여부',
+    created_at    DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 일시',
+    updated_at    DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
+    deleted_at    DATETIME         NULL COMMENT '삭제 일시',
     CONSTRAINT PK_posts PRIMARY KEY (post_id),
     CONSTRAINT FK_posts_members FOREIGN KEY (member_id) REFERENCES members (member_id),
     FULLTEXT INDEX IDX_fulltext_posts_title_content (title, content) WITH PARSER ngram

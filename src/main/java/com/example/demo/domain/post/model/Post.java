@@ -77,6 +77,10 @@ public class Post extends BaseAuditingEntity {
     @Builder.Default
     private Integer likeCount = 0;
 
+    @Column(name = "comment_count", nullable = false)
+    @Builder.Default
+    private Integer commentCount = 0;
+
     @Column(name = "is_deleted", nullable = false)
     @Builder.Default
     private Boolean isDeleted = false;
@@ -107,11 +111,12 @@ public class Post extends BaseAuditingEntity {
     // ========================= JPA Callback Methods =========================
 
     /**
-     * 좋아요 수를 업데이트합니다.
+     * 좋아요 수, 댓글 수를 업데이트합니다.
      */
     @PreUpdate
-    private void updateLikeCount() {
+    private void updateCounts() {
         likeCount = postLikes.size();
+        updateCommentCount();
     }
 
     // ========================= Relationship Methods =========================
@@ -135,6 +140,13 @@ public class Post extends BaseAuditingEntity {
         if (deletedAt != null || isDeleted) throw new IllegalStateException("이미 삭제된 게시글입니다.");
         isDeleted = true;
         deletedAt = LocalDateTime.now();
+    }
+
+    /**
+     * 댓글 수를 업데이트합니다.
+     */
+    public void updateCommentCount() {
+        commentCount = Math.toIntExact(comments.stream().filter(comment -> !comment.getIsDeleted()).count());
     }
 
 }

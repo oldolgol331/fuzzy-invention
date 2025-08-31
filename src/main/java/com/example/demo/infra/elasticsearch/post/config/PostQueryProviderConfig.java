@@ -41,7 +41,8 @@ public class PostQueryProviderConfig {
                 " P.view_count AS view_count," +
                 " P.like_count AS like_count," +
                 " P.is_deleted AS is_deleted," +
-                " (SELECT COUNT(C.comment_id) FROM comments AS C WHERE C.post_id = P.post_id) AS comment_count," +
+                //" (SELECT COUNT(C.comment_id) FROM comments AS C WHERE C.post_id = P.post_id) AS comment_count," +
+                " P.comment_count AS comment_count," +
                 " P.created_at AS created_at," +
                 " P.updated_at AS updated_at"
         );

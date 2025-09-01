@@ -64,7 +64,7 @@ public class CommentServiceImpl implements CommentService {
         Post post = postRepository.findByIdAndIsDeletedFalse(postId)
                                   .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
         Comment savedComment = commentRepository.save(Comment.of(writer, post, request.getContent()));
-        savedComment.getPost().updateCommentCount();
+        postRepository.updateCommentCount(savedComment.getPost().getId(), 1);
     }
 
     /**
@@ -117,7 +117,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findByIdAndWriterIdAndPostIdAndIsDeletedFalse(commentId, writerId, postId)
                                            .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
         comment.delete();
-        comment.getPost().updateCommentCount();
+        postRepository.updateCommentCount(comment.getPost().getId(), -1);
     }
 
     /**

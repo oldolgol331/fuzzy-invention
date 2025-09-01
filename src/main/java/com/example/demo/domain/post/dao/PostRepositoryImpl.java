@@ -118,7 +118,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                                                         POST.isDeleted,
                                                                         POST.createdAt,
                                                                         POST.updatedAt,
-                                                                        COMMENT.id.count().intValue()
+                                                                        jpaQueryFactory.select(
+                                                                                               COMMENT.id.count().intValue()
+                                                                                       )
+                                                                                       .from(COMMENT)
+                                                                                       .where(
+                                                                                               COMMENT.post.id.eq(POST.id),
+                                                                                               COMMENT.isDeleted.isFalse()
+                                                                                       )
                                                                 )
                                                         )
                                                         .from(POST)

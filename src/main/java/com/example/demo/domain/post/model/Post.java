@@ -19,7 +19,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -108,17 +107,6 @@ public class Post extends BaseAuditingEntity {
         return post;
     }
 
-    // ========================= JPA Callback Methods =========================
-
-    /**
-     * 좋아요 수, 댓글 수를 업데이트합니다.
-     */
-    @PreUpdate
-    private void updateCounts() {
-        likeCount = postLikes.size();
-        updateCommentCount();
-    }
-
     // ========================= Relationship Methods =========================
 
     /**
@@ -140,13 +128,6 @@ public class Post extends BaseAuditingEntity {
         if (deletedAt != null || isDeleted) throw new IllegalStateException("이미 삭제된 게시글입니다.");
         isDeleted = true;
         deletedAt = LocalDateTime.now();
-    }
-
-    /**
-     * 댓글 수를 업데이트합니다.
-     */
-    public void updateCommentCount() {
-        commentCount = Math.toIntExact(comments.stream().filter(comment -> !comment.getIsDeleted()).count());
     }
 
 }

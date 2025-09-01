@@ -5,6 +5,9 @@ import com.example.demo.domain.post.model.Post;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * PackageName : com.example.demo.domain.post.dao
@@ -25,5 +28,9 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     Optional<Post> findByIdAndWriterIdAndIsDeletedFalse(Long id, UUID writerId);
 
     boolean existsByIdAndIsDeletedFalse(Long id);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Post p SET p.commentCount = p.commentCount + :amount WHERE p.id = :postId")
+    void updateCommentCount(@Param("postId") Long postId, @Param("amount") int amount);
 
 }

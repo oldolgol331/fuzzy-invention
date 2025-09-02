@@ -8,6 +8,7 @@ import com.example.demo.domain.post.event.event.PostChangedEvent;
 import com.example.demo.infra.elasticsearch.post.dao.PostSearchRepository;
 import com.example.demo.infra.elasticsearch.post.model.PostDocument;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -29,6 +30,7 @@ public class PostEventListener {
     private final PostRepository       postRepository;
     private final PostSearchRepository postSearchRepository;
 
+    @Async
     @TransactionalEventListener(phase = AFTER_COMMIT)
     public void handlePostChangeEvent(final PostChangedEvent event) {
         final Long       postId     = event.getPostId();

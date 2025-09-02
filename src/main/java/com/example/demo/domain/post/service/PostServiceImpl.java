@@ -21,8 +21,12 @@ import com.example.demo.domain.post.event.event.PostChangedEvent;
 import com.example.demo.domain.post.model.Post;
 import com.example.demo.domain.post.model.PostLike;
 import com.example.demo.domain.post.model.PostLikeId;
-import com.example.demo.infra.elasticsearch.post.dao.PostSearchRepository;
+import com.example.demo.domain.post.service.PostCountServiceImpl.PostCountDto;
+import com.example.demo.infra.redis.dao.RedisRepository;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -50,7 +54,11 @@ public class PostServiceImpl implements PostService {
     private final PostLikeRepository        postLikeRepository;
     private final MemberRepository          memberRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final PostSearchRepository      postSearchRepository;
+    //private final PostSearchRepository      postSearchRepository;
+
+    private final PostCountService postCountService;
+    private final PostCacheService postCacheService;
+    private final RedisRepository  redisRepository;
 
     /**
      * 새로운 게시글을 생성합니다.
@@ -67,6 +75,8 @@ public class PostServiceImpl implements PostService {
         Post savedPost = postRepository.save(Post.of(writer, request.getTitle(), request.getContent()));
 
         eventPublisher.publishEvent(PostChangedEvent.of(savedPost.getId(), CREATED));
+
+        postCacheService.evictPostListCache();
 
         return PostDetailResponse.builder()
                                  .id(savedPost.getId())
@@ -88,11 +98,14 @@ public class PostServiceImpl implements PostService {
      *
      * @param postId   - 게시글 ID
      * @param writerId - 작성자 ID
+     * @param clientIp - 클라이언트 IP
      * @return 조회된 게시글 상세 정보 응답 DTO
      */
     @Override
-    public PostDetailResponse getPostDetailById(final Long postId, final UUID writerId) {
-        return postRepository.getPost(postId, writerId);
+    public PostDetailResponse getPostDetailById(final Long postId, final UUID writerId, final String clientIp) {
+        PostDetailResponse response = postRepository.getPost(postId, writerId);
+        postCountService.incrementViewCount(postId, clientIp);
+        return response;
     }
 
     /**
@@ -104,7 +117,27 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Page<PostListResponse> getPosts(final String keyword, final Pageable pageable) {
-        return postSearchRepository.getPosts(keyword, pageable);
+        Page<PostListResponse> responsePage = postCacheService.getPosts(keyword, pageable);
+
+        if (!responsePage.hasContent()) return responsePage;
+
+        List<Long> postIdsOnCurrentPage = responsePage.getContent()
+                                                      .stream()
+                                                      .map(PostListResponse::getId)
+                                                      .collect(Collectors.toList());
+
+        Map<Long, PostCountDto> counts = postCountService.getViewCounts(postIdsOnCurrentPage);
+        responsePage.getContent().forEach(
+                response -> {
+                    for (int i = 0; i < counts.size(); i++) {
+                        response.setViewCount(counts.get(response.getId()).getViewCount());
+                        response.setLikeCount(counts.get(response.getId()).getLikeCount());
+                        response.setCommentCount(counts.get(response.getId()).getCommentCount());
+                    }
+                }
+        );
+
+        return responsePage;
     }
 
     /**
@@ -127,6 +160,8 @@ public class PostServiceImpl implements PostService {
         post.setContent(request.getNewContent());
 
         eventPublisher.publishEvent(PostChangedEvent.of(postId, UPDATED));
+
+        postCacheService.evictPostListCache();
 
         return PostDetailResponse.builder()
                                  .id(post.getId())
@@ -160,6 +195,8 @@ public class PostServiceImpl implements PostService {
         eventPublisher.publishEvent(PostChangedEvent.of(postId, DELETED));
 
         post.delete();
+
+        postCacheService.evictPostListCache();
     }
 
     /**
@@ -180,8 +217,11 @@ public class PostServiceImpl implements PostService {
         if (post.getWriter().getId().equals(memberId)) throw new CustomException(POST_LIKE_CANNOT);
 
         PostLikeId postLikeId = PostLikeId.builder().memberId(memberId).postId(postId).build();
-        if (postLikeRepository.existsById(postLikeId)) postLikeRepository.deleteById(postLikeId);
-        else postLikeRepository.save(PostLike.of(member, post));
+        if (postLikeRepository.existsById(postLikeId)) {
+            postLikeRepository.deleteById(postLikeId);
+        } else {
+            postLikeRepository.save(PostLike.of(member, post));
+        }
 
         eventPublisher.publishEvent(PostChangedEvent.of(postId, UPDATED));
 

@@ -76,6 +76,8 @@ public class PostViewCountProcessor {
         registerAfterCommitTasks(chunkKeys, postIdToViewCountMap);
     }
 
+    // ========================= Private Methods =========================
+
     private void registerAfterCommitTasks(final List<String> keysToDelete, final Map<Long, Long> countsToUpdate) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override

@@ -10,6 +10,7 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * PackageName : com.example.demo.domain.post.dto
@@ -38,18 +39,21 @@ public class PostResponse {
         private final String        writer;
         @Schema(name = "게시글 제목")
         private final String        title;
-        @Schema(name = "조회수")
-        private final Long          viewCount;
-        @Schema(name = "좋아요 수")
-        private final Integer       likeCount;
         @Schema(name = "삭제 여부")
         private final Boolean       isDeleted;
         @Schema(name = "생성 일시")
         private final LocalDateTime createdAt;
         @Schema(name = "최종 수정 일시")
         private final LocalDateTime updatedAt;
+        @Setter
+        @Schema(name = "조회수")
+        private       Long          viewCount;
+        @Setter
+        @Schema(name = "좋아요 수")
+        private       Integer       likeCount;
+        @Setter
         @Schema(name = "댓글 수")
-        private final Integer       commentCount;
+        private       Integer       commentCount;
 
         @Builder
         @QueryProjection
@@ -69,12 +73,12 @@ public class PostResponse {
             this.writerId = writerId;
             this.writer = writer;
             this.title = title;
-            this.viewCount = viewCount;
-            this.likeCount = likeCount;
+            this.viewCount = viewCount != null ? viewCount : 0L;
+            this.likeCount = likeCount != null ? likeCount : 0;
             this.isDeleted = isDeleted;
             this.createdAt = createdAt;
             this.updatedAt = updatedAt;
-            this.commentCount = commentCount;
+            this.commentCount = commentCount != null ? commentCount : 0;
         }
 
         public static PostListResponse from(final Post post) {

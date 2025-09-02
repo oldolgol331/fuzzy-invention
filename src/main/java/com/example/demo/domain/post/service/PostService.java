@@ -23,7 +23,7 @@ public interface PostService {
 
     PostDetailResponse createPost(UUID writerId, PostCreateRequest request);
 
-    PostDetailResponse getPostDetailById(Long postId, UUID writerId);
+    PostDetailResponse getPostDetailById(Long postId, UUID writerId, String clientIp);
 
     Page<PostListResponse> getPosts(String keyword, Pageable pageable);
 

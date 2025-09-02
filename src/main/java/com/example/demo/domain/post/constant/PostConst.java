@@ -21,5 +21,6 @@ public class PostConst {
     public static final String POST_VIEW_LOG_KEY_PREFIX   = "post:view:log:%s:%s";
     public static final String POST_VIEW_COUNT_KEY_PREFIX = "post:view:count:%s";
     public static final String POST_VIEW_COUNT_PATTERN    = "post:view:count:*";
+    public static final String POST_VIEW_KEY_PREFIX       = "post:view:%s";
 
 }

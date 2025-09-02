@@ -16,7 +16,6 @@ import com.example.demo.domain.post.dto.PostRequest.PostUpdateRequest;
 import com.example.demo.domain.post.dto.PostResponse.PostDetailResponse;
 import com.example.demo.domain.post.dto.PostResponse.PostListResponse;
 import com.example.demo.domain.post.service.PostService;
-import com.example.demo.domain.post.service.PostViewCountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.servlet.http.HttpServletRequest;
@@ -58,8 +57,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "게시글 API", description = "게시글 작성, 수정, 조회/검색, 삭제 API를 제공합니다.")
 public class PostController {
 
-    private final PostService          postService;
-    private final PostViewCountService postViewCountService;
+    private final PostService postService;
 
     @PostMapping
     @Operation(summary = "게시글 작성", description = "새 게시글을 작성합니다.")
@@ -81,9 +79,8 @@ public class PostController {
             final HttpServletRequest request
     ) {
         PostDetailResponse responseData = postService.getPostDetailById(
-                postId, userDetails != null ? userDetails.getId() : null
+                postId, userDetails != null ? userDetails.getId() : null, getClientIp(request)
         );
-        postViewCountService.incrementViewCount(postId, getClientIp(request));
         return ResponseEntity.ok(ApiResponse.success(POST_READ_SUCCESS, responseData));
     }
 

@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -117,17 +118,36 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Page<PostListResponse> getPosts(final String keyword, final Pageable pageable) {
-        Page<PostListResponse> responsePage = postCacheService.getPosts(keyword, pageable);
+//        Page<PostListResponse> responsePage = postCacheService.getPosts(keyword, pageable);
+//
+//        if (!responsePage.hasContent()) return responsePage;
+//
+//        List<Long> postIdsOnCurrentPage = responsePage.getContent()
+//                                                      .stream()
+//                                                      .map(PostListResponse::getId)
+//                                                      .collect(Collectors.toList());
+//
+//        Map<Long, PostCountDto> counts = postCountService.getViewCounts(postIdsOnCurrentPage);
+//        responsePage.getContent().forEach(
+//                response -> {
+//                    for (int i = 0; i < counts.size(); i++) {
+//                        response.setViewCount(counts.get(response.getId()).getViewCount());
+//                        response.setLikeCount(counts.get(response.getId()).getLikeCount());
+//                        response.setCommentCount(counts.get(response.getId()).getCommentCount());
+//                    }
+//                }
+//        );
+//
+//        return responsePage;
+        List<PostListResponse> content       = postCacheService.getPosts(keyword, pageable);
+        long                   totalElements = postCacheService.getTotalCount(keyword);
 
-        if (!responsePage.hasContent()) return responsePage;
-
-        List<Long> postIdsOnCurrentPage = responsePage.getContent()
-                                                      .stream()
-                                                      .map(PostListResponse::getId)
-                                                      .collect(Collectors.toList());
+        List<Long> postIdsOnCurrentPage = content.stream()
+                                                 .map(PostListResponse::getId)
+                                                 .collect(Collectors.toList());
 
         Map<Long, PostCountDto> counts = postCountService.getViewCounts(postIdsOnCurrentPage);
-        responsePage.getContent().forEach(
+        content.forEach(
                 response -> {
                     for (int i = 0; i < counts.size(); i++) {
                         response.setViewCount(counts.get(response.getId()).getViewCount());
@@ -137,7 +157,7 @@ public class PostServiceImpl implements PostService {
                 }
         );
 
-        return responsePage;
+        return new PageImpl<>(content, pageable, totalElements);
     }
 
     /**

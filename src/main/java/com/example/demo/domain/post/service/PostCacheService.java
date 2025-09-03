@@ -1,7 +1,7 @@
 package com.example.demo.domain.post.service;
 
 import com.example.demo.domain.post.dto.PostResponse.PostListResponse;
-import org.springframework.data.domain.Page;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 /**
@@ -17,7 +17,9 @@ import org.springframework.data.domain.Pageable;
  */
 public interface PostCacheService {
 
-    Page<PostListResponse> getPosts(String keyword, Pageable pageable);
+    List<PostListResponse> getPosts(String keyword, Pageable pageable);
+
+    long getTotalCount(String keyword);
 
     void evictPostListCache();
 

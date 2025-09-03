@@ -1,6 +1,8 @@
 package com.example.demo.infra.redis.config;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,6 +12,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -28,6 +31,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * ---------------------------------------------------------------------------------------------------------------------
  * 25. 8. 28.    oldolgol331          Initial creation
  */
+@Profile("!test")
 @Configuration
 @RequiredArgsConstructor
 public class RedisCacheConfig {
@@ -36,11 +40,19 @@ public class RedisCacheConfig {
 
     @Bean
     public CacheManager cacheManager(final RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration defaultConfig = createCacheConfiguration(Duration.ofHours(1), objectMapper);
+        ObjectMapper copiedObjectMapper = objectMapper.copy();
+
+        copiedObjectMapper.activateDefaultTyping(
+                BasicPolymorphicTypeValidator.builder().allowIfSubType(Object.class).build(),
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+        );
+
+        RedisCacheConfiguration defaultConfig = createCacheConfiguration(Duration.ofHours(1), copiedObjectMapper);
 
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
-        cacheConfigurations.put("posts", createCacheConfiguration(Duration.ofMinutes(10), objectMapper));
-        cacheConfigurations.put("comments", createCacheConfiguration(Duration.ofMinutes(30), objectMapper));
+        cacheConfigurations.put("posts", createCacheConfiguration(Duration.ofMinutes(10), copiedObjectMapper));
+        cacheConfigurations.put("comments", createCacheConfiguration(Duration.ofMinutes(30), copiedObjectMapper));
 
         return RedisCacheManager.builder(redisConnectionFactory)
                                 .cacheDefaults(defaultConfig)

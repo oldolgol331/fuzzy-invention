@@ -27,4 +27,6 @@ public interface PostSearchRepositoryCustom {
 
     Map<Long, PostCountDto> findCountsById(List<Long> postIds);
 
+    long countByKeyword(String keyword);
+
 }

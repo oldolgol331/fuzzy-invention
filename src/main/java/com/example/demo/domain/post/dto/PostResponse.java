@@ -3,6 +3,8 @@ package com.example.demo.domain.post.dto;
 import static lombok.AccessLevel.PRIVATE;
 
 import com.example.demo.domain.post.model.Post;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -57,17 +59,18 @@ public class PostResponse {
 
         @Builder
         @QueryProjection
+        @JsonCreator
         public PostListResponse(
-                final Long id,
-                final UUID writerId,
-                final String writer,
-                final String title,
-                final Long viewCount,
-                final Integer likeCount,
-                final Boolean isDeleted,
-                final LocalDateTime createdAt,
-                final LocalDateTime updatedAt,
-                final Integer commentCount
+                @JsonProperty("id") final Long id,
+                @JsonProperty("writerId") final UUID writerId,
+                @JsonProperty("writer") final String writer,
+                @JsonProperty("title") final String title,
+                @JsonProperty("viewCount") final Long viewCount,
+                @JsonProperty("likeCount") final Integer likeCount,
+                @JsonProperty("isDeleted") final Boolean isDeleted,
+                @JsonProperty("createdAt") final LocalDateTime createdAt,
+                @JsonProperty("updatedAt") final LocalDateTime updatedAt,
+                @JsonProperty("commentCount") final Integer commentCount
         ) {
             this.id = id;
             this.writerId = writerId;

@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -42,6 +43,7 @@ import org.springframework.util.StringUtils;
 public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
 
     private final ElasticsearchRestTemplate elasticsearchRestTemplate;
+    private final ElasticsearchOperations   elasticsearchOperations;
 
     /**
      * 검색된 게시글 목록을 반환합니다. 페이징 정보를 사용하여 결과를 페이지화하고, 검색어가 있을 경우 검색어를 포함한 게시글을 찾습니다.
@@ -60,12 +62,12 @@ public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
                                  .fields(Collections.singletonMap("title", 3.0f))
             );
 
-        Query nativeSearchQuery = new NativeSearchQueryBuilder().withQuery(boolQueryBuilder)
-                                                                .withPageable(pageable)
-                                                                .build();
+        Query query = new NativeSearchQueryBuilder().withQuery(boolQueryBuilder)
+                                                    .withPageable(pageable)
+                                                    .build();
 
         SearchHits<PostDocument> searchHits = elasticsearchRestTemplate.search(
-                nativeSearchQuery, PostDocument.class, IndexCoordinates.of("posts")
+                query, PostDocument.class, IndexCoordinates.of("posts")
         );
 
         List<PostListResponse> content = searchHits.getSearchHits()
@@ -167,6 +169,27 @@ public class PostSearchRepositoryImpl implements PostSearchRepositoryCustom {
                                  doc -> Long.parseLong(doc.getId()),
                                  doc -> PostCountDto.of(0L, doc.getLikeCount(), doc.getCommentCount())
                          ));
+    }
+
+    /**
+     * 게시글 개수를 검색합니다. 검색어가 있을 경우 검색어를 포함한 게시글의 수를 반환합니다.
+     *
+     * @param keyword - 검색어
+     * @return 전체 게시글 수
+     */
+    @Override
+    public long countByKeyword(final String keyword) {
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        if (StringUtils.hasText(keyword))
+            boolQueryBuilder.must(
+                    QueryBuilders.multiMatchQuery(keyword, "title", "content")
+                                 .fields(Collections.singletonMap("title", 3.0f))
+            );
+
+        Query query = new NativeSearchQueryBuilder().withQuery(boolQueryBuilder).build();
+
+        return elasticsearchOperations.count(query, PostDocument.class);
     }
 
 }

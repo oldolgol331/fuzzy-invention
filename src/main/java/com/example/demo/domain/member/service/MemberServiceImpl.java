@@ -30,11 +30,12 @@ import com.example.demo.domain.member.dto.MemberRequest.MemberWithdrawRequest;
 import com.example.demo.domain.member.dto.MemberResponse.MemberInfoResponse;
 import com.example.demo.domain.member.model.Member;
 import com.example.demo.domain.member.model.OAuthConnection;
+import com.example.demo.domain.member.service.properties.EmailProperties;
 import com.example.demo.infra.redis.dao.RedisRepository;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository          memberRepository;
@@ -59,27 +61,7 @@ public class MemberServiceImpl implements MemberService {
     private final RedisRepository           redisRepository;
     private final PasswordEncoder           passwordEncoder;
     private final EmailService              emailService;
-
-    private final long   tokenExpiryMinutes;
-    private final String verificationBaseUrl;
-
-    public MemberServiceImpl(
-            final MemberRepository memberRepository,
-            final OAuthConnectionRepository oAuthConnectionRepository,
-            final RedisRepository redisRepository,
-            final PasswordEncoder passwordEncoder,
-            final EmailService emailService,
-            @Value("${email.verification.token-expiry-minutes}") final long tokenExpiryMinutes,
-            @Value("${email.verification.base-url}") final String verificationBaseUrl
-    ) {
-        this.memberRepository = memberRepository;
-        this.oAuthConnectionRepository = oAuthConnectionRepository;
-        this.redisRepository = redisRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
-        this.tokenExpiryMinutes = tokenExpiryMinutes;
-        this.verificationBaseUrl = verificationBaseUrl;
-    }
+    private final EmailProperties           emailProperties;
 
     /**
      * 회원 가입 요청을 처리합니다. 이메일 인증을 위한 토큰을 생성하고 이메일을 발송합니다.
@@ -307,10 +289,10 @@ public class MemberServiceImpl implements MemberService {
         redisRepository.setValue(
                 VERIFICATION_KEY_PREFIX + verificationToken,
                 member.getId().toString(),
-                Duration.ofMinutes(tokenExpiryMinutes)
+                Duration.ofMinutes(emailProperties.getTokenExpiryMinutes())
         );
 
-        String verificationLink = verificationBaseUrl + verificationToken;
+        String verificationLink = emailProperties.getBaseUrl() + verificationToken;
         emailService.sendVerificationEmail(member.getEmail(), verificationLink);
     }
 

@@ -1,5 +1,6 @@
 package com.example.demo.domain.common.util;
 
+import static com.example.demo.domain.member.constant.MemberConst.PASSWORD_PATTERN;
 import static lombok.AccessLevel.PRIVATE;
 
 import com.example.demo.domain.member.model.Member;
@@ -63,7 +64,7 @@ public abstract class TestUtils {
                                                  .parameter(String.class, "nickname")
                              )
                              .setLazy("email", () -> FAKER.internet().emailAddress())
-                             .setLazy("password", () -> FAKER.internet().password())
+                             .setLazy("password", TestUtils::createPassword)
                              .setLazy("nickname", () -> FAKER.name().username().replace(".", "").substring(0, 5))
                              .sampleList(size);
     }
@@ -73,21 +74,25 @@ public abstract class TestUtils {
     }
 
     public static List<OAuthConnection> createOAuthConnections(final Member member, final int size) {
-        return FIXTURE_MONKEY.giveMeBuilder(OAuthConnection.class)
-                             .instantiate(
-                                     Instantiator.factoryMethod("of")
-                                                 .parameter(Member.class, "member")
-                                                 .parameter(String.class, "provider")
-                                                 .parameter(String.class, "providerId")
-                             )
-                             .set("member", member)
-                             .setLazy("provider", () -> FAKER.company().name())
-                             .setLazy("providerId", () -> UUID.randomUUID().toString())
-                             .sampleList(size);
+        return IntStream.range(0, size)
+                        .mapToObj(
+                                i -> OAuthConnection.of(
+                                        member, FAKER.company().name(), UUID.randomUUID().toString()
+                                )
+                        )
+                        .collect(Collectors.toList());
     }
 
     public static OAuthConnection createOAuthConnection(final Member member) {
         return createOAuthConnections(member, 1).get(0);
+    }
+
+    private static String createPassword() {
+        String password;
+        do {
+            password = FAKER.internet().password(8, 20, true, true);
+        } while (!PASSWORD_PATTERN.matcher(password).matches());
+        return password;
     }
 
 }

@@ -15,13 +15,11 @@ import com.example.demo.common.config.QuerydslConfig;
 import com.example.demo.domain.member.model.Member;
 import java.util.Optional;
 import java.util.UUID;
-import javax.persistence.EntityManager;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -40,24 +38,24 @@ import org.springframework.context.annotation.Import;
 class MemberRepositoryTest {
 
     @Autowired
-    private EntityManager    em;
+    private TestEntityManager em;
     @Autowired
-    private MemberRepository memberRepository;
+    private MemberRepository  memberRepository;
 
-    @BeforeEach
-    void setup() {
-        em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE");
-        //em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0");
-        em.createNativeQuery("TRUNCATE TABLE members RESTART IDENTITY");
-        em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE");
-        //em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1");
-    }
+//    @BeforeEach
+//    void setup() {
+//        em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE");
+//        //em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0");
+//        em.createNativeQuery("TRUNCATE TABLE members RESTART IDENTITY");
+//        em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE");
+//        //em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1");
+//    }
 
-    @AfterEach
-    void clear() {
-        em.flush();
-        em.clear();
-    }
+//    @AfterEach
+//    void clear() {
+//        em.flush();
+//        em.clear();
+//    }
 
     @RepeatedTest(10)
     void save() {
@@ -66,7 +64,7 @@ class MemberRepositoryTest {
 
         // when
         UUID id = memberRepository.save(member).getId();
-        clear();
+        em.flush();
 
         // then
         Member savedMember = em.find(Member.class, id);
@@ -80,10 +78,8 @@ class MemberRepositoryTest {
     @RepeatedTest(10)
     void findById() {
         // given
-        Member member = createMember();
-        em.persist(member);
-        UUID id = member.getId();
-        clear();
+        Member member = em.persistAndFlush(createMember());
+        UUID   id     = member.getId();
 
         // when
         Member findMember = memberRepository.findById(id).get();
@@ -109,34 +105,31 @@ class MemberRepositoryTest {
     @RepeatedTest(10)
     void update() {
         // given
-        Member member = createMember();
-        em.persist(member);
-        UUID id = member.getId();
-        clear();
+        Member member         = em.persistAndFlush(createMember());
+        String beforeNickname = member.getNickname();
+        String beforePassword = member.getPassword();
+        UUID   id             = member.getId();
 
         // when
         Member findMember = memberRepository.findById(id).get();
         findMember.setNickname("updated" + findMember.getNickname());
         findMember.setPassword("updated" + findMember.getPassword());
-        clear();
 
         // then
         Member updatedMember = em.find(Member.class, id);
 
         assertNotNull(updatedMember);
         assertEquals(findMember.getNickname(), updatedMember.getNickname());
-        assertNotEquals(member.getNickname(), updatedMember.getNickname());
+        assertNotEquals(beforeNickname, updatedMember.getNickname());
         assertEquals(findMember.getPassword(), updatedMember.getPassword());
-        assertNotEquals(member.getPassword(), updatedMember.getPassword());
+        assertNotEquals(beforePassword, updatedMember.getPassword());
     }
 
     @RepeatedTest(10)
     void deleteById() {
         // given
-        Member member = createMember();
-        em.persist(member);
-        UUID id = member.getId();
-        clear();
+        Member member = em.persistAndFlush(createMember());
+        UUID   id     = member.getId();
 
         // when
         memberRepository.deleteById(id);

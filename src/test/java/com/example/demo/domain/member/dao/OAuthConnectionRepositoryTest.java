@@ -17,13 +17,11 @@ import com.example.demo.domain.member.model.OAuthConnection;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.util.Optional;
-import javax.persistence.EntityManager;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -42,36 +40,35 @@ import org.springframework.context.annotation.Import;
 class OAuthConnectionRepositoryTest {
 
     @Autowired
-    private EntityManager             em;
+    private TestEntityManager         em;
     @Autowired
     private OAuthConnectionRepository oAuthConnectionRepository;
 
-    @BeforeEach
-    void setup() {
-        em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE");
-        //em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0");
-        em.createNativeQuery("TRUNCATE TABLE members RESTART IDENTITY");
-        em.createNativeQuery("TRUNCATE TABLE oauth_connections RESTART IDENTITY");
-        em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE");
-        //em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1");
-    }
+//    @BeforeEach
+//    void setup() {
+//        em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE");
+//        //em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0");
+//        em.createNativeQuery("TRUNCATE TABLE members RESTART IDENTITY");
+//        em.createNativeQuery("TRUNCATE TABLE oauth_connections RESTART IDENTITY");
+//        em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE");
+//        //em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1");
+//    }
 
-    @AfterEach
-    void clear() {
-        em.flush();
-        em.clear();
-    }
+//    @AfterEach
+//    void clear() {
+//        em.flush();
+//        em.clear();
+//    }
 
     @RepeatedTest(10)
     void save() {
         // given
-        Member member = createMember();
-        em.persist(member);
+        Member          member          = em.persistAndFlush(createMember());
         OAuthConnection oAuthConnection = createOAuthConnection(member);
 
         // when
         Long id = oAuthConnectionRepository.save(oAuthConnection).getId();
-        clear();
+        em.flush();
 
         // then
         OAuthConnection savedOAuthConnection = em.find(OAuthConnection.class, id);
@@ -84,12 +81,9 @@ class OAuthConnectionRepositoryTest {
     @RepeatedTest(10)
     void findById() {
         // given
-        Member member = createMember();
-        em.persist(member);
-        OAuthConnection oAuthConnection = createOAuthConnection(member);
-        em.persist(oAuthConnection);
-        Long id = oAuthConnection.getId();
-        clear();
+        Member          member          = em.persistAndFlush(createMember());
+        OAuthConnection oAuthConnection = em.persistAndFlush(createOAuthConnection(member));
+        Long            id              = oAuthConnection.getId();
 
         // when
         OAuthConnection findOAuthConnection = oAuthConnectionRepository.findById(id).get();
@@ -114,12 +108,9 @@ class OAuthConnectionRepositoryTest {
     @RepeatedTest(10)
     void deleteById() {
         // given
-        Member member = createMember();
-        em.persist(member);
-        OAuthConnection oAuthConnection = createOAuthConnection(member);
-        em.persist(oAuthConnection);
-        Long id = oAuthConnection.getId();
-        clear();
+        Member          member          = em.persistAndFlush(createMember());
+        OAuthConnection oAuthConnection = em.persistAndFlush(createOAuthConnection(member));
+        Long            id              = oAuthConnection.getId();
 
         // when
         oAuthConnectionRepository.deleteById(id);

@@ -1,4 +1,4 @@
-package com.example.demo.domain.infra.redis.config;
+package com.example.demo.infra.redis.config;
 
 import static com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.NON_FINAL;
 
